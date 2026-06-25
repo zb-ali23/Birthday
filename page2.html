@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SURPRISE! 🎉</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:#0d0010;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+}
+
+/* ── STAR CANVAS ── */
+#starCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
+
+/* ── PETALS ── */
+.petal{
+  position:fixed;pointer-events:none;z-index:1;
+  animation:petalFall var(--pd,9s) linear infinite var(--pdel,0s);
+  opacity:0;top:-30px;font-size:var(--ps,14px);
+}
+@keyframes petalFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:0.7;}
+  100%{transform:translateY(110vh) rotate(540deg);opacity:0;}
+}
+
+/* ── PAGE FADE ── */
+.page-fade{
+  position:fixed;inset:0;background:#0d0010;
+  z-index:200;opacity:1;pointer-events:all;
+  transition:opacity 0.8s ease;
+}
+.page-fade.gone{opacity:0;pointer-events:none;}
+
+/* ── CENTER STAGE ── */
+.stage{
+  position:relative;z-index:10;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:1rem;
+  min-height:100vh;
+  width:100%;
+}
+
+/* ── SURPRISE TEXT ── */
+.surprise-wrap{
+  display:flex;gap:4px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:1rem;
+}
+.s-letter{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(3rem,10vw,6rem);
+  color:#fff;
+  display:inline-block;
+  opacity:0;
+  transform:translateY(-80px) scale(0.5);
+  transition:opacity 0.5s cubic-bezier(.34,1.56,.64,1),
+             transform 0.5s cubic-bezier(.34,1.56,.64,1);
+  text-shadow:0 0 40px rgba(255,110,180,0.9),0 0 80px rgba(255,110,180,0.4);
+  line-height:1;
+}
+.s-letter.show{opacity:1;transform:translateY(0) scale(1);}
+
+/* ── SUBTITLE ── */
+.bday-sub{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(1.4rem,4vw,2.2rem);
+  color:rgba(255,255,255,0.9);
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 0.8s ease,transform 0.8s ease;
+  letter-spacing:0.08em;
+  text-shadow:0 0 30px rgba(255,110,180,0.6);
+  margin-bottom:0.4rem;
+}
+.bday-sub.show{opacity:1;transform:translateY(0);}
+
+.bday-year{
+  font-family:'Poppins',sans-serif;
+  font-size:clamp(0.7rem,2vw,0.88rem);
+  color:rgba(255,255,255,0.35);
+  letter-spacing:0.35em;
+  text-transform:uppercase;
+  font-weight:300;
+  opacity:0;
+  transition:opacity 1s ease;
+  margin-bottom:2.5rem;
+}
+.bday-year.show{opacity:1;}
+
+/* ── BALLOONS ── */
+.balloon-wrap{
+  position:fixed;bottom:-200px;left:0;right:0;
+  pointer-events:none;z-index:5;
+  display:flex;justify-content:space-around;
+  padding:0 2rem;
+}
+.balloon{
+  display:flex;flex-direction:column;align-items:center;
+  opacity:0;
+  animation:none;
+}
+.balloon.fly{
+  animation:balloonFly var(--bspeed,8s) ease-in forwards var(--bdelay,0s);
+}
+@keyframes balloonFly{
+  0%{transform:translateY(0) rotate(var(--tilt,0deg));opacity:0;}
+  10%{opacity:1;}
+  90%{opacity:1;}
+  100%{transform:translateY(-130vh) rotate(calc(var(--tilt,0deg)*1.5));opacity:0;}
+}
+.balloon-body{
+  width:var(--bw,52px);
+  height:calc(var(--bw,52px)*1.25);
+  border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  background:var(--bcol,#f48fb1);
+  position:relative;
+  box-shadow:inset -6px -6px 14px rgba(0,0,0,0.18),inset 4px 4px 10px rgba(255,255,255,0.25);
+}
+.balloon-body::after{
+  content:'';
+  position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-top:8px solid var(--bcol,#f48fb1);
+}
+.balloon-string{
+  width:1px;height:60px;
+  background:rgba(255,255,255,0.3);
+  margin-top:2px;
+}
+
+/* ── MUSIC PLAYER ── */
+.music-player{
+  position:fixed;bottom:20px;left:20px;
+  z-index:50;
+  background:rgba(255,255,255,0.95);
+  border:0.5px solid #f4c0d1;
+  border-radius:50px;
+  padding:10px 18px 10px 12px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 32px rgba(180,0,80,0.18);
+  opacity:0;
+  transform:translateY(20px);
+  transition:opacity 0.6s ease,transform 0.6s ease;
+  max-width:220px;
+}
+.music-player.show{opacity:1;transform:translateY(0);}
+.album-art{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,#f48fb1,#e91e8c);
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+  animation:albumSpin 4s linear infinite paused;
+}
+.album-art.playing{animation-play-state:running;}
+@keyframes albumSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.player-info{flex:1;overflow:hidden;}
+.song-title{
+  font-size:0.65rem;font-weight:600;color:#b5005b;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  letter-spacing:0.02em;
+}
+.song-sub{font-size:0.55rem;color:#d4537e;font-weight:300;margin-top:1px;}
+.eq-bars{
+  display:flex;align-items:flex-end;gap:2px;height:16px;
+  margin-top:4px;
+}
+.eq-bar{
+  width:3px;border-radius:2px;
+  background:#f48fb1;
+  animation:eqAnim var(--es,0.6s) ease-in-out infinite alternate var(--esdel,0s);
+  height:var(--eh,8px);
+}
+@keyframes eqAnim{
+  from{transform:scaleY(0.3);}to{transform:scaleY(1);}
+}
+.play-btn{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,#f48fb1,#e91e8c);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:0.8rem;
+  box-shadow:0 3px 10px rgba(233,30,140,0.35);
+  transition:transform 0.2s;flex-shrink:0;
+}
+.play-btn:hover{transform:scale(1.1);}
+
+/* ── NEXT BUTTON ── */
+.next-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,#f06292,#d4537e,#ad1457);
+  color:#fff;border:none;border-radius:50px;
+  padding:15px 44px;
+  font-family:'Poppins',sans-serif;font-size:0.82rem;
+  font-weight:500;letter-spacing:0.14em;text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:0 8px 28px rgba(180,0,80,0.4);
+  opacity:0;transform:translateY(20px);
+  transition:opacity 0.7s ease,transform 0.7s ease,box-shadow 0.2s;
+  text-decoration:none;
+}
+.next-btn.show{opacity:1;transform:translateY(0);}
+.next-btn:hover{box-shadow:0 12px 36px rgba(180,0,80,0.55);transform:translateY(-3px);}
+.next-btn .arrow{display:inline-block;transition:transform 0.2s;}
+.next-btn:hover .arrow{transform:translateX(5px);}
+
+/* ── GLOW RING ── */
+.glow-ring{
+  position:fixed;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:2;
+  animation:ringPulse var(--rspeed,4s) ease-in-out infinite var(--rdel,0s);
+  opacity:0;
+}
+@keyframes ringPulse{
+  0%,100%{transform:scale(1);opacity:0.08;}
+  50%{transform:scale(1.3);opacity:0.18;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+<div class="page-fade" id="pageFade"></div>
+
+<!-- GLOW RINGS -->
+<div class="glow-ring" style="width:400px;height:400px;background:radial-gradient(circle,#e91e8c,transparent);top:50%;left:50%;margin:-200px 0 0 -200px;--rspeed:5s;--rdel:0s;"></div>
+<div class="glow-ring" style="width:600px;height:600px;background:radial-gradient(circle,#f48fb1,transparent);top:50%;left:50%;margin:-300px 0 0 -300px;--rspeed:7s;--rdel:1s;"></div>
+
+<!-- BALLOON WRAP -->
+<div class="balloon-wrap" id="balloonWrap"></div>
+
+<!-- CENTER STAGE -->
+<div class="stage">
+  <div class="surprise-wrap" id="surpriseWrap"></div>
+  <div class="bday-sub" id="bdaySub">Happy 20th Birthday, Khizra! 🎂</div>
+  <div class="bday-year" id="bdayYear">June 25, 2005 &nbsp;·&nbsp; Twenty years of magic</div>
+  <a href="page3.html" class="next-btn" id="nextBtn">
+    Let's celebrate &nbsp;<span class="arrow">→</span>
+  </a>
+</div>
+
+<!-- MUSIC PLAYER -->
+<div class="music-player" id="musicPlayer">
+  <div class="album-art" id="albumArt">🎵</div>
+  <div class="player-info">
+    <div class="song-title">Love Story</div>
+    <div class="song-sub">Indila</div>
+    <div class="eq-bars">
+      <div class="eq-bar" style="--es:0.5s;--esdel:0s;--eh:10px;"></div>
+      <div class="eq-bar" style="--es:0.7s;--esdel:0.1s;--eh:14px;"></div>
+      <div class="eq-bar" style="--es:0.4s;--esdel:0.2s;--eh:8px;"></div>
+      <div class="eq-bar" style="--es:0.6s;--esdel:0.05s;--eh:16px;"></div>
+      <div class="eq-bar" style="--es:0.5s;--esdel:0.15s;--eh:10px;"></div>
+    </div>
+  </div>
+  <button class="play-btn" id="playBtn" onclick="toggleMusic()">▶</button>
+</div>
+
+<!-- ADD YOUR SONG: <audio id="bgMusic" src="your-song.mp3" loop></audio> -->
+<audio id="bgMusic" loop></audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script>
+// ── STAR CANVAS ──
+const canvas = document.getElementById('starCanvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+const stars = Array.from({length:180},()=>({
+  x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+  r:Math.random()*1.8+0.2,b:Math.random(),
+  sp:Math.random()*0.01+0.003,dir:Math.random()>0.5?1:-1
+}));
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.b+=s.sp*s.dir;if(s.b>1||s.b<0)s.dir*=-1;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,180,220,${s.b*0.9})`;ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// ── PETALS ──
+const petalEmojis=['🌸','🌺','✿','🌷','❀','💕'];
+for(let i=0;i<24;i++){
+  const p=document.createElement('div');p.className='petal';
+  p.textContent=petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+  p.style.left=Math.random()*100+'%';
+  p.style.setProperty('--ps',(8+Math.random()*12)+'px');
+  p.style.setProperty('--pd',(6+Math.random()*10)+'s');
+  p.style.setProperty('--pdel',(Math.random()*10)+'s');
+  document.body.appendChild(p);
+}
+
+// ── BUILD BALLOONS ──
+const balloonColors=['#f48fb1','#e91e8c','#f06292','#c2185b','#f8bbd0','#ad1457','#ff80ab','#ff4081'];
+const bWrap = document.getElementById('balloonWrap');
+for(let i=0;i<10;i++){
+  const col = balloonColors[i%balloonColors.length];
+  const size = 40+Math.random()*30;
+  const tilt = (Math.random()*20-10).toFixed(1);
+  const speed = (7+Math.random()*5).toFixed(1);
+  const delay = (Math.random()*3).toFixed(1);
+  const b = document.createElement('div');
+  b.className='balloon';
+  b.style.setProperty('--bspeed',speed+'s');
+  b.style.setProperty('--bdelay',delay+'s');
+  b.style.setProperty('--tilt',tilt+'deg');
+  b.innerHTML=`<div class="balloon-body" style="--bw:${size}px;--bcol:${col};"></div><div class="balloon-string"></div>`;
+  bWrap.appendChild(b);
+}
+
+// ── SURPRISE TEXT ──
+const word = 'SURPRISE! 🎉';
+const wrap = document.getElementById('surpriseWrap');
+[...word].forEach((ch,i)=>{
+  const span=document.createElement('span');
+  span.className='s-letter';
+  span.textContent=ch===' '?'\u00A0':ch;
+  wrap.appendChild(span);
+});
+
+// ── MAIN SEQUENCE ──
+window.addEventListener('load',()=>{
+  // Fade in page
+  setTimeout(()=>{document.getElementById('pageFade').classList.add('gone');},100);
+
+  // Confetti burst
+  setTimeout(()=>{
+    confetti({particleCount:180,spread:100,origin:{y:0.5},colors:['#f48fb1','#e91e8c','#fff','#f8bbd0','#c2185b']});
+    confetti({particleCount:100,angle:60,spread:80,origin:{x:0,y:0.5},colors:['#f48fb1','#e91e8c','#fff']});
+    confetti({particleCount:100,angle:120,spread:80,origin:{x:1,y:0.5},colors:['#f48fb1','#e91e8c','#fff']});
+  },600);
+
+  // Letters drop in one by one
+  const letters = document.querySelectorAll('.s-letter');
+  letters.forEach((l,i)=>{
+    setTimeout(()=>l.classList.add('show'), 700 + i*90);
+  });
+
+  // Subtitle
+  setTimeout(()=>document.getElementById('bdaySub').classList.add('show'), 700+letters.length*90+300);
+
+  // Year line
+  setTimeout(()=>document.getElementById('bdayYear').classList.add('show'), 700+letters.length*90+700);
+
+  // Balloons fly
+  setTimeout(()=>{
+    document.querySelectorAll('.balloon').forEach(b=>b.classList.add('fly'));
+  },900);
+
+  // Second confetti
+  setTimeout(()=>{
+    confetti({particleCount:120,spread:120,origin:{y:0.3},colors:['#f48fb1','#e91e8c','#fff','#fce4ec']});
+  },2200);
+
+  // Music player
+  setTimeout(()=>document.getElementById('musicPlayer').classList.add('show'),2000);
+
+  // Next button
+  setTimeout(()=>document.getElementById('nextBtn').classList.add('show'), 700+letters.length*90+1400);
+
+  // Sparkle confetti loop
+  setTimeout(()=>{
+    setInterval(()=>{
+      if(Math.random()>0.5){
+        confetti({particleCount:18,spread:60,origin:{x:Math.random(),y:Math.random()*0.5},colors:['#f48fb1','#e91e8c','#fff'],scalar:0.7});
+      }
+    },3000);
+  },4000);
+});
+
+// ── MUSIC PLAYER ──
+const music = document.getElementById('bgMusic');
+const playBtn = document.getElementById('playBtn');
+const albumArt = document.getElementById('albumArt');
+let isPlaying = false;
+
+function toggleMusic(){
+  if(!music.src || music.src===window.location.href){
+    // No audio file added yet — just toggle animation for demo
+    isPlaying=!isPlaying;
+    playBtn.textContent=isPlaying?'⏸':'▶';
+    albumArt.classList.toggle('playing',isPlaying);
+    return;
+  }
+  if(isPlaying){
+    music.pause();
+    playBtn.textContent='▶';
+    albumArt.classList.remove('playing');
+  } else {
+    music.play();
+    playBtn.textContent='⏸';
+    albumArt.classList.add('playing');
+  }
+  isPlaying=!isPlaying;
+}
+
+// Next transition handled globally by music.js
+</script>
+<script src="music.js"></script>
+</body>
+</html>

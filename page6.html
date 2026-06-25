@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Her Photos 🌸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush:    #fff0f5;
+      --pink-lt:  #f8bbd0;
+      --pink-mid: #f4c0d1;
+      --pink-acc: #d4537e;
+      --deep:     #b5005b;
+      --rose:     #e91e8c;
+      --ink:      #993556;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--blush);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── section titles ── */
+    .sec-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 5.5vw, 3rem);
+      color: var(--deep);
+      text-align: center;
+      line-height: 1.2;
+    }
+    .sec-eyebrow {
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--pink-mid);
+      margin-bottom: 0.4rem;
+    }
+    .sec-sub {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--pink-acc);
+      margin-top: 0.4rem;
+      font-style: italic;
+    }
+
+    /* ── shared photo placeholder ── */
+    .photo-ph {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #fce4ec, #f48fb1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      border-radius: inherit;
+    }
+    .photo-ph .ph-icon { font-size: 1.6rem; }
+    .photo-ph .ph-label {
+      font-size: 0.58rem;
+      font-weight: 400;
+      color: var(--deep);
+      letter-spacing: 0.06em;
+      text-align: center;
+      padding: 0 0.5rem;
+    }
+
+    /* ══════════════════════════════════
+       SECTION A — MORPHING BLOB HERO
+    ══════════════════════════════════ */
+    #sec-blob {
+      padding: 4rem 1rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blob-title-wrap {
+      margin-bottom: 3rem;
+    }
+
+    .blob-arena {
+      position: relative;
+      width: min(360px, 90vw);
+      height: min(360px, 90vw);
+      margin: 0 auto;
+    }
+
+    /* Dashed rings */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px dashed var(--pink-mid);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .ring-1 {
+      width: min(310px, 86vw); height: min(310px, 86vw);
+      animation: spin-cw  20s linear infinite;
+    }
+    .ring-2 {
+      width: min(360px, 90vw); height: min(360px, 90vw);
+      border-color: #f9d0e0;
+      animation: spin-ccw 28s linear infinite;
+    }
+    @keyframes spin-cw  { to { transform: translate(-50%,-50%) rotate(360deg);  } }
+    @keyframes spin-ccw { to { transform: translate(-50%,-50%) rotate(-360deg); } }
+
+    /* Main morphing blob */
+    .blob-main {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(180px, 46vw); height: min(180px, 46vw);
+      overflow: hidden;
+      animation: morph 8s ease-in-out infinite;
+      box-shadow: 0 8px 32px rgba(181,0,91,0.22);
+      cursor: pointer;
+      z-index: 2;
+    }
+    .blob-main img { object-position: top center; }
+    @keyframes morph {
+      0%   { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      20%  { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+      40%  { border-radius: 70% 30% 50% 50% / 30% 70% 60% 40%; }
+      60%  { border-radius: 40% 60% 30% 70% / 60% 40% 50% 50%; }
+      80%  { border-radius: 50% 50% 60% 40% / 40% 50% 60% 70%; }
+      100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    }
+
+    /* Orbiting photos */
+    .orbit-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      transform: translate(-50%, -50%);
+    }
+    .orbit-photo {
+      position: absolute;
+      width: min(72px, 18vw); height: min(72px, 18vw);
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2.5px solid #fff;
+      box-shadow: 0 4px 14px rgba(181,0,91,0.22);
+      cursor: pointer;
+      top: calc(min(36px, 9vw) * -1); left: calc(min(36px, 9vw) * -1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .orbit-photo img { object-position: top center; }
+    .orbit-photo:hover {
+      box-shadow: 0 6px 22px rgba(181,0,91,0.4);
+      z-index: 20;
+    }
+
+    /* Each orbit photo rotates at different speed & start angle */
+    /* orbit angle: rotate(Adeg) translateX(145px) rotate(-Adeg) */
+    .op-0 { animation: orbit-0 18s linear infinite; }
+    .op-1 { animation: orbit-1 22s linear infinite; }
+    .op-2 { animation: orbit-2 16s linear infinite; }
+    .op-3 { animation: orbit-3 25s linear infinite; }
+    .op-4 { animation: orbit-4 20s linear infinite; }
+
+    @keyframes orbit-0 {
+      from { transform: rotate(0deg)   translateX(min(145px, 37vw)) rotate(0deg);   }
+      to   { transform: rotate(360deg) translateX(min(145px, 37vw)) rotate(-360deg); }
+    }
+    @keyframes orbit-1 {
+      from { transform: rotate(72deg)  translateX(min(145px, 37vw)) rotate(-72deg);  }
+      to   { transform: rotate(432deg) translateX(min(145px, 37vw)) rotate(-432deg); }
+    }
+    @keyframes orbit-2 {
+      from { transform: rotate(144deg) translateX(min(145px, 37vw)) rotate(-144deg); }
+      to   { transform: rotate(504deg) translateX(min(145px, 37vw)) rotate(-504deg); }
+    }
+    @keyframes orbit-3 {
+      from { transform: rotate(216deg) translateX(min(145px, 37vw)) rotate(-216deg); }
+      to   { transform: rotate(576deg) translateX(min(145px, 37vw)) rotate(-576deg); }
+    }
+    @keyframes orbit-4 {
+      from { transform: rotate(288deg) translateX(min(145px, 37vw)) rotate(-288deg); }
+      to   { transform: rotate(648deg) translateX(min(145px, 37vw)) rotate(-648deg); }
+    }
+
+    /* ══════════════════════════════════
+       SECTION B — POLAROID SCATTER
+    ══════════════════════════════════ */
+    #sec-polaroid {
+      padding: 2rem 1rem 5rem;
+      background: linear-gradient(180deg, var(--blush) 0%, #ffe4ef 100%);
+    }
+
+    .polaroid-field {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      min-height: 560px;
+      margin: 2.5rem auto 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 1rem;
+    }
+
+    .polaroid {
+      background: #fff;
+      padding: 10px 10px 38px;
+      box-shadow: 0 6px 24px rgba(181,0,91,0.14), 0 2px 6px rgba(0,0,0,0.06);
+      border-radius: 3px;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s;
+      will-change: transform;
+      position: relative;
+    }
+    .polaroid:hover {
+      box-shadow: 0 16px 44px rgba(181,0,91,0.28);
+      z-index: 30 !important;
+    }
+
+    /* Pushpin */
+    .pushpin {
+      position: absolute;
+      top: -10px; left: 50%;
+      transform: translateX(-50%);
+      width: 18px; height: 18px;
+      background: radial-gradient(circle at 40% 35%, #f78fb3 0%, var(--deep) 100%);
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(181,0,91,0.4);
+      z-index: 2;
+    }
+    .pushpin::after {
+      content: '';
+      position: absolute;
+      bottom: -8px; left: 50%;
+      transform: translateX(-50%);
+      width: 3px; height: 10px;
+      background: #999;
+      border-radius: 0 0 2px 2px;
+    }
+
+    .polaroid-photo {
+      width: min(150px, 38vw);
+      height: min(140px, 35vw);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .polaroid-photo img { object-position: top center; }
+
+    .polaroid-caption {
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1rem;
+      color: var(--ink);
+      font-style: italic;
+      margin-top: 4px;
+      line-height: 1.2;
+      padding: 0 4px;
+    }
+
+    /* Scattered rotations — remove absolute positioning for flex layout */
+    .pol-0 { transform: rotate(-6deg); }
+    .pol-1 { transform: rotate( 4deg); }
+    .pol-2 { transform: rotate(-3deg); }
+    .pol-3 { transform: rotate( 7deg); }
+    .pol-4 { transform: rotate(-5deg); }
+    .pol-5 { transform: rotate( 3deg); }
+    .pol-6 { transform: rotate(-8deg); }
+
+    .polaroid:hover { transform: rotate(0deg) scale(1.08) !important; box-shadow: 0 16px 44px rgba(181,0,91,0.28); z-index: 30; }
+
+    /* ══════════════════════════════════
+       SECTION C — MAGAZINE STRIP
+    ══════════════════════════════════ */
+    #sec-strip {
+      padding: 2rem 0 5rem;
+    }
+    .strip-header { padding: 0 1.5rem 2rem; }
+
+    .strip-scroll {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 1rem 2rem 2rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--pink-mid) transparent;
+    }
+    .strip-scroll::-webkit-scrollbar { height: 4px; }
+    .strip-scroll::-webkit-scrollbar-thumb { background: var(--pink-mid); border-radius: 4px; }
+
+    .strip-card {
+      flex-shrink: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      scroll-snap-align: start;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 4px 18px rgba(181,0,91,0.12);
+    }
+    .strip-card:hover { transform: translateY(-6px); box-shadow: 0 12px 36px rgba(181,0,91,0.24); }
+    .strip-card img { object-position: top center; }
+
+    .strip-card.tall   { width: clamp(110px, 22vw, 140px); height: clamp(160px, 32vw, 200px); }
+    .strip-card.square { width: clamp(120px, 25vw, 155px); height: clamp(120px, 25vw, 155px); }
+    .strip-card.wide   { width: clamp(150px, 30vw, 190px); height: clamp(120px, 24vw, 150px); }
+
+    /* Number overlay */
+    .strip-num {
+      position: absolute;
+      top: 10px; left: 12px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.85);
+      z-index: 2;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Emoji */
+    .strip-emoji {
+      position: absolute;
+      bottom: 36px; right: 12px;
+      font-size: 1.4rem;
+      z-index: 2;
+    }
+
+    /* Caption overlay on hover */
+    .strip-caption-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(181,0,91,0.82) 0%, transparent 100%);
+      padding: 1.2rem 0.8rem 0.7rem;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 3;
+    }
+    .strip-card:hover .strip-caption-overlay { transform: translateY(0); }
+    .strip-caption-overlay span {
+      font-family: 'Dancing Script', cursive;
+      font-size: 0.95rem;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    /* ══════════════════════════════════
+       LIGHTBOX
+    ══════════════════════════════════ */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,180,210,0.38);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #lightbox.active { opacity: 1; pointer-events: all; }
+
+    .lb-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 1.5rem 1.5rem 1.4rem;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 16px 60px rgba(181,0,91,0.22);
+      transform: scale(0.8);
+      transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+    }
+    #lightbox.active .lb-card { transform: scale(1); }
+
+    .lb-photo {
+      width: 100%;
+      height: 300px;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    .lb-caption {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.3rem;
+      color: var(--deep);
+      text-align: center;
+      margin-bottom: 0.3rem;
+    }
+    .lb-date {
+      font-size: 0.68rem;
+      font-weight: 300;
+      color: var(--pink-acc);
+      text-align: center;
+      letter-spacing: 0.07em;
+    }
+
+    /* Close btn */
+    .lb-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--pink-lt);
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .lb-close:hover { background: var(--deep); color: #fff; transform: scale(1.1); }
+
+    /* Arrows */
+    .lb-arrows {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .lb-arrow {
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 3px 10px rgba(181,0,91,0.25);
+    }
+    .lb-arrow:hover { transform: scale(1.07); box-shadow: 0 5px 18px rgba(181,0,91,0.38); }
+    .lb-arrow:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+    .lb-counter {
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--pink-acc);
+      letter-spacing: 0.1em;
+      margin-top: 0.5rem;
+    }
+
+    /* Floating sparkles background on hero section */
+    #blob-bg-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    #sec-blob > *:not(#blob-bg-canvas) { position: relative; z-index: 1; }
+    .continue-btn-wrap {
+      text-align: center;
+      margin: 3rem 0 5rem;
+      position: relative;
+      z-index: 10;
+    }
+    .continue-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      color: #fff;
+      text-decoration: none;
+      padding: 0.75rem 2.4rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      box-shadow: 0 5px 20px rgba(181,0,91,0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: 'Poppins', sans-serif;
+    }
+    .continue-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 8px 28px rgba(181,0,91,0.4);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     SECTION A — MORPHING BLOB HERO
+══════════════════════════════════ -->
+<section id="sec-blob">
+  <canvas id="blob-bg-canvas"></canvas>
+
+  <div class="blob-title-wrap">
+    <div class="sec-eyebrow">✦ a gallery of her ✦</div>
+    <h1 class="sec-title">She is the moment</h1>
+    <p class="sec-sub">Click any photo to open it 🌸</p>
+  </div>
+
+  <div class="blob-arena">
+    <!-- Dashed rings -->
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+
+    <!-- MAIN BLOB PHOTO -->
+    <div class="blob-main photo-clickable" data-idx="0">
+      <img src="Pictures/IMG_7733.PNG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+    </div>
+
+    <!-- Orbiting photos -->
+    <div class="orbit-ring">
+
+      <div class="orbit-photo op-0 photo-clickable" data-idx="1">
+        <img src="Pictures/IMG_7734.PNG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      </div>
+
+      <div class="orbit-photo op-1 photo-clickable" data-idx="2">
+        <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (5).jpeg" alt="Khizra" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      </div>
+
+      <div class="orbit-photo op-2 photo-clickable" data-idx="3">
+        <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (6).jpeg" alt="Khizra" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      </div>
+
+      <div class="orbit-photo op-3 photo-clickable" data-idx="4">
+        <img src="Pictures/HPPT3636.JPG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      </div>
+
+      <div class="orbit-photo op-4 photo-clickable" data-idx="5">
+        <img src="Pictures/IMG_7733.PNG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SECTION B — POLAROID SCATTER
+══════════════════════════════════ -->
+<section id="sec-polaroid">
+  <div class="sec-eyebrow">✦ scattered memories ✦</div>
+  <h2 class="sec-title">The ones I keep coming back to</h2>
+  <p class="sec-sub">Hover to lift a polaroid 📌</p>
+
+  <div class="polaroid-field">
+
+    <div class="polaroid pol-0 photo-clickable" data-idx="6">
+      <div class="pushpin"></div>
+      <div class="polaroid-photo">
+        <img src="Pictures/IMG_7734.PNG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="polaroid-caption">that one day 🌸</div>
+    </div>
+
+    <div class="polaroid pol-1 photo-clickable" data-idx="7">
+      <div class="pushpin"></div>
+      <div class="polaroid-photo">
+        <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (7).jpeg" alt="Khizra" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="polaroid-caption">pure happiness ✨</div>
+    </div>
+
+    <div class="polaroid pol-2 photo-clickable" data-idx="8">
+      <div class="pushpin"></div>
+      <div class="polaroid-photo">
+        <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (8).jpeg" alt="Khizra" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="polaroid-caption">unbothered 💅</div>
+    </div>
+
+    <div class="polaroid pol-3 photo-clickable" data-idx="9">
+      <div class="pushpin"></div>
+      <div class="polaroid-photo">
+        <img src="Pictures/HPPT3636.JPG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="polaroid-caption">golden hour 🌅</div>
+    </div>
+
+    <div class="polaroid pol-4 photo-clickable" data-idx="10">
+      <div class="pushpin"></div>
+      <div class="polaroid-photo">
+        <img src="Pictures/IMG_7733.PNG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="polaroid-caption">can't stop won't stop 💕</div>
+    </div>
+
+    <div class="polaroid pol-5 photo-clickable" data-idx="11">
+      <div class="pushpin"></div>
+      <div class="polaroid-photo">
+        <img src="Pictures/IMG_7734.PNG" alt="Khizra" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="polaroid-caption">night vibes 🌙</div>
+    </div>
+
+    <div class="polaroid pol-6 photo-clickable" data-idx="12">
+      <div class="pushpin"></div>
+      <div class="polaroid-photo">
+        <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.49 PM.jpeg" alt="Khizra" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="polaroid-caption">twenty looks good 🎂</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     SECTION C — MAGAZINE STRIP
+══════════════════════════════════ -->
+<section id="sec-strip">
+  <div class="strip-header">
+    <div class="sec-eyebrow">✦ moments, lined up ✦</div>
+    <h2 class="sec-title">The highlight reel</h2>
+    <p class="sec-sub">Scroll sideways → hover to reveal →</p>
+  </div>
+
+  <div class="strip-scroll">
+
+    <div class="strip-card tall photo-clickable" data-idx="13">
+      <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.49 PM (1).jpeg" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">01</div>
+      <div class="strip-caption-overlay"><span>effortlessly her</span></div>
+    </div>
+
+    <div class="strip-card square photo-clickable" data-idx="14">
+      <img src="Pictures/IMG_7733.PNG" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">02</div>
+      <div class="strip-caption-overlay"><span>unmatched energy</span></div>
+    </div>
+
+    <div class="strip-card wide photo-clickable" data-idx="15">
+      <img src="Pictures/HPPT3636.JPG" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">03</div>
+      <div class="strip-caption-overlay"><span>the main character</span></div>
+    </div>
+
+    <div class="strip-card tall photo-clickable" data-idx="16">
+      <img src="Pictures/IMG_7734.PNG" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">04</div>
+      <div class="strip-caption-overlay"><span>radiating joy</span></div>
+    </div>
+
+    <div class="strip-card square photo-clickable" data-idx="17">
+      <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.47 PM.jpeg" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">05</div>
+      <div class="strip-caption-overlay"><span>in her element</span></div>
+    </div>
+
+    <div class="strip-card wide photo-clickable" data-idx="18">
+      <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM.jpeg" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">06</div>
+      <div class="strip-caption-overlay"><span>golden, always</span></div>
+    </div>
+
+    <div class="strip-card tall photo-clickable" data-idx="19">
+      <img src="Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (1).jpeg" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">07</div>
+      <div class="strip-caption-overlay"><span>absolutely unstoppable</span></div>
+    </div>
+
+    <div class="strip-card square photo-clickable" data-idx="20">
+      <img src="Pictures/HPPT3636.JPG" alt="Khizra" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div class="strip-num">08</div>
+      <div class="strip-caption-overlay"><span>twenty & iconic</span></div>
+    </div>
+
+  </div>
+  <div class="continue-btn-wrap">
+    <a href="page7.html" class="continue-btn">Why You're Amazing →</a>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     LIGHTBOX
+══════════════════════════════════ -->
+<div id="lightbox">
+  <div class="lb-card">
+    <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
+
+    <div class="lb-photo" id="lb-photo">
+      <!-- photo content injected by JS -->
+    </div>
+
+    <div class="lb-caption" id="lb-caption">Photo caption</div>
+    <div class="lb-date"    id="lb-date">A beautiful moment</div>
+
+    <div class="lb-arrows">
+      <button class="lb-arrow" id="lb-prev">← prev</button>
+      <button class="lb-arrow" id="lb-next">next →</button>
+    </div>
+    <div class="lb-counter" id="lb-counter"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   PHOTO DATA — all 21 slots
+   To replace a placeholder:
+   1. Set src to your image path e.g. "photos/my-image.jpg"
+   2. Update caption and date
+══════════════════════════════════════════ */
+const PHOTOS = [
+  /* 0 */ { src: 'Pictures/IMG_7733.PNG',                                         emoji:'🌸', label:'Main hero photo',  caption:'She is the moment',          date:'June 2025' },
+  /* 1 */ { src: 'Pictures/IMG_7734.PNG',                                         emoji:'💗', label:'Orbit photo 2',    caption:'Always glowing',              date:'2024' },
+  /* 2 */ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (5).jpeg',   emoji:'🌺', label:'Orbit photo 3',    caption:'Effortlessly beautiful',      date:'2024' },
+  /* 3 */ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (6).jpeg',   emoji:'⭐', label:'Orbit photo 4',    caption:'Shining bright',              date:'2023' },
+  /* 4 */ { src: 'Pictures/HPPT3636.JPG',                                         emoji:'🦋', label:'Orbit photo 5',    caption:'Free spirit',                 date:'2023' },
+  /* 5 */ { src: 'Pictures/IMG_7733.PNG',                                         emoji:'🌙', label:'Orbit photo 6',    caption:'Golden hour',                 date:'2022' },
+  /* 6 */ { src: 'Pictures/IMG_7734.PNG',                                         emoji:'🌸', label:'Polaroid 1',       caption:'That one day 🌸',             date:'Summer 2024' },
+  /* 7 */ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (7).jpeg',   emoji:'💗', label:'Polaroid 2',       caption:'Pure happiness ✨',            date:'Spring 2024' },
+  /* 8 */ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (8).jpeg',   emoji:'🌺', label:'Polaroid 3',       caption:'Unbothered 💅',               date:'Winter 2023' },
+  /* 9 */ { src: 'Pictures/HPPT3636.JPG',                                         emoji:'⭐', label:'Polaroid 4',       caption:'Golden hour 🌅',              date:'Autumn 2023' },
+  /* 10*/ { src: 'Pictures/IMG_7733.PNG',                                         emoji:'🦋', label:'Polaroid 5',       caption:"Can't stop won't stop 💕",    date:'Summer 2023' },
+  /* 11*/ { src: 'Pictures/IMG_7734.PNG',                                         emoji:'🌙', label:'Polaroid 6',       caption:'Night vibes 🌙',              date:'2022' },
+  /* 12*/ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.49 PM.jpeg',       emoji:'🎂', label:'Polaroid 7',       caption:'Twenty looks good 🎂',        date:'June 25, 2025' },
+  /* 13*/ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.49 PM (1).jpeg',   emoji:'🌸', label:'Strip card 1',     caption:'Effortlessly her',            date:'2025' },
+  /* 14*/ { src: 'Pictures/IMG_7733.PNG',                                         emoji:'💗', label:'Strip card 2',     caption:'Unmatched energy',            date:'2025' },
+  /* 15*/ { src: 'Pictures/HPPT3636.JPG',                                         emoji:'🌺', label:'Strip card 3',     caption:'The main character',          date:'2024' },
+  /* 16*/ { src: 'Pictures/IMG_7734.PNG',                                         emoji:'⭐', label:'Strip card 4',     caption:'Radiating joy',               date:'2024' },
+  /* 17*/ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.47 PM.jpeg',       emoji:'🦋', label:'Strip card 5',     caption:'In her element',              date:'2023' },
+  /* 18*/ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM.jpeg',       emoji:'🌙', label:'Strip card 6',     caption:'Golden, always',              date:'2023' },
+  /* 19*/ { src: 'Pictures/WhatsApp Image 2026-06-25 at 11.44.48 PM (1).jpeg',   emoji:'✨', label:'Strip card 7',     caption:'Absolutely unstoppable',      date:'2022' },
+  /* 20*/ { src: 'Pictures/HPPT3636.JPG',                                         emoji:'🎂', label:'Strip card 8',     caption:'Twenty & iconic',             date:'June 2025' },
+];
+
+/* ══ LIGHTBOX ══ */
+const lightbox  = document.getElementById('lightbox');
+const lbPhoto   = document.getElementById('lb-photo');
+const lbCaption = document.getElementById('lb-caption');
+const lbDate    = document.getElementById('lb-date');
+const lbClose   = document.getElementById('lb-close');
+const lbPrev    = document.getElementById('lb-prev');
+const lbNext    = document.getElementById('lb-next');
+const lbCounter = document.getElementById('lb-counter');
+
+let currentIdx = 0;
+
+function renderLightbox(idx) {
+  const p = PHOTOS[idx];
+  currentIdx = idx;
+
+  lbPhoto.innerHTML = '';
+  if (p.src) {
+    const img = document.createElement('img');
+    img.src = p.src;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:14px;';
+    lbPhoto.appendChild(img);
+  } else {
+    const ph = document.createElement('div');
+    ph.className = 'photo-ph';
+    ph.style.borderRadius = '14px';
+    ph.innerHTML = `<span class="ph-icon" style="font-size:2.5rem">${p.emoji}</span>
+                    <span class="ph-label" style="font-size:0.7rem">${p.label}</span>`;
+    lbPhoto.appendChild(ph);
+  }
+
+  lbCaption.textContent = p.caption;
+  lbDate.textContent    = p.date;
+  lbCounter.textContent = `${idx + 1} / ${PHOTOS.length}`;
+  lbPrev.disabled = idx === 0;
+  lbNext.disabled = idx === PHOTOS.length - 1;
+}
+
+function openLightbox(idx) {
+  renderLightbox(idx);
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+lbClose.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', e => {
+  if (!lightbox.classList.contains('active')) return;
+  if (e.key === 'Escape')      closeLightbox();
+  if (e.key === 'ArrowLeft'  && currentIdx > 0)               openLightbox(currentIdx - 1);
+  if (e.key === 'ArrowRight' && currentIdx < PHOTOS.length-1) openLightbox(currentIdx + 1);
+});
+lbPrev.addEventListener('click', () => { if (currentIdx > 0)               openLightbox(currentIdx - 1); });
+lbNext.addEventListener('click', () => { if (currentIdx < PHOTOS.length-1) openLightbox(currentIdx + 1); });
+
+// Wire all clickable photos
+document.querySelectorAll('.photo-clickable').forEach(el => {
+  el.addEventListener('click', () => {
+    const idx = parseInt(el.dataset.idx);
+    openLightbox(idx);
+  });
+});
+
+/* ══ BLOB BG SPARKLES ══ */
+(function () {
+  const canvas = document.getElementById('blob-bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  const sec    = document.getElementById('sec-blob');
+
+  function resize() {
+    canvas.width  = sec.offsetWidth;
+    canvas.height = sec.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const pts = Array.from({length: 30}, () => ({
+    x: Math.random() * sec.offsetWidth,
+    y: Math.random() * sec.offsetHeight,
+    r: 1.5 + Math.random() * 3,
+    a: 0.1 + Math.random() * 0.35,
+    da: (Math.random() > 0.5 ? 1 : -1) * 0.004,
+    dx: (Math.random() - 0.5) * 0.3,
+    dy: (Math.random() - 0.5) * 0.3,
+  }));
+
+  function frame() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (const p of pts) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0.05, Math.min(0.5, p.a));
+      ctx.fillStyle = '#f48fb1';
+      ctx.beginPath();
+      // tiny 4-pt star
+      const s = p.r;
+      ctx.moveTo(p.x, p.y - s*2);
+      [45,90,135,180,225,270,315].forEach((deg, i) => {
+        const r2 = i%2===0 ? s*0.6 : s*2;
+        const a  = (deg - 90) * Math.PI/180;
+        ctx.lineTo(p.x + r2*Math.cos(a), p.y + r2*Math.sin(a));
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+      p.x += p.dx; p.y += p.dy; p.a += p.da;
+      if (p.a > 0.5 || p.a < 0.05) p.da *= -1;
+      if (p.x < 0 || p.x > canvas.width)  p.dx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+<script src="music.js"></script>
+</body>
+</html>

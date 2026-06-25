@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Secret & Your Wish ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush:    #fff0f5;
+      --pink-lt:  #f8bbd0;
+      --pink-mid: #f4c0d1;
+      --pink-acc: #d4537e;
+      --deep:     #b5005b;
+      --rose:     #e91e8c;
+      --cream:    #fff9fb;
+      --gold:     #f5c842;
+      --orange:   #ff7043;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--blush);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── CONFETTI CANVAS ── */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── PAGE ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 6rem;
+    }
+
+    /* ── SECTION DIVIDER ── */
+    .section-sep {
+      text-align: center;
+      margin: 3.5rem 0;
+      color: var(--pink-mid);
+      font-size: 1.1rem;
+      letter-spacing: 0.4em;
+    }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.8rem, 5vw, 2.7rem);
+      color: var(--deep);
+      text-align: center;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+    .sec-sub {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--pink-acc);
+      margin-bottom: 2rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* ════════════════════════════════
+       SECTION A — SCRATCH CARD
+    ════════════════════════════════ */
+    .scratch-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Hidden message behind canvas */
+    .scratch-wrapper {
+      position: relative;
+      width: 300px;
+      height: 180px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(181,0,91,0.18);
+      user-select: none;
+    }
+
+    .scratch-reveal {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.2rem;
+      text-align: center;
+      z-index: 0;
+    }
+    .scratch-reveal-msg {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.25rem;
+      color: var(--deep);
+      line-height: 1.45;
+    }
+    .scratch-reveal-emoji {
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Canvas sits on top */
+    #scratch-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='10' fill='rgba(255,255,255,0.6)' stroke='%23e91e8c' stroke-width='2'/%3E%3C/svg%3E") 12 12, crosshair;
+      border-radius: 16px;
+      transition: opacity 0.5s;
+    }
+    #scratch-canvas.fading { opacity: 0; }
+
+    .scratch-hint {
+      font-size: 0.78rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--pink-acc);
+      letter-spacing: 0.03em;
+    }
+
+    /* Reset button */
+    #scratch-reset {
+      display: none;
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.5rem 1.5rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(181,0,91,0.28);
+      transition: transform 0.2s;
+    }
+    #scratch-reset:hover { transform: scale(1.05); }
+
+    /* Scratch progress bar */
+    .scratch-progress-wrap {
+      width: 300px;
+    }
+    .scratch-progress-track {
+      height: 4px;
+      background: #fce4ec;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .scratch-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f78fb3, var(--deep));
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.2s;
+    }
+    .scratch-progress-label {
+      font-size: 0.62rem;
+      color: var(--pink-acc);
+      letter-spacing: 0.07em;
+      text-align: right;
+      margin-top: 0.3rem;
+    }
+
+    /* ════════════════════════════════
+       SECTION B — BIRTHDAY CAKE
+    ════════════════════════════════ */
+    .cake-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    /* Candle counter */
+    .candle-counter {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--pink-acc);
+      letter-spacing: 0.07em;
+    }
+    .candle-counter strong {
+      font-weight: 600;
+      color: var(--deep);
+      font-size: 1rem;
+    }
+
+    /* ── THE CAKE ── */
+    .cake-scene {
+      position: relative;
+      width: 280px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .cake-scene:hover { filter: drop-shadow(0 8px 24px rgba(181,0,91,0.2)); }
+
+    @keyframes cake-shake {
+      0%,100% { transform: translateX(0) rotate(0); }
+      15%      { transform: translateX(-6px) rotate(-2deg); }
+      30%      { transform: translateX(6px) rotate(2deg); }
+      45%      { transform: translateX(-5px) rotate(-1.5deg); }
+      60%      { transform: translateX(5px) rotate(1.5deg); }
+      75%      { transform: translateX(-3px) rotate(-1deg); }
+      90%      { transform: translateX(3px) rotate(1deg); }
+    }
+    .cake-scene.shaking { animation: cake-shake 0.6s ease; }
+
+    /* CANDLES ROW */
+    .candles-row {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 4px;
+      margin-bottom: -2px;
+      position: relative;
+      z-index: 2;
+      flex-wrap: nowrap;
+      padding: 0 10px;
+    }
+
+    .candle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Flame */
+    .flame {
+      width: 6px;
+      height: 10px;
+      background: linear-gradient(to top, var(--orange), var(--gold), #fff5c0);
+      border-radius: 50% 50% 40% 40%;
+      margin-bottom: 1px;
+      transform-origin: bottom center;
+      animation: flicker 0.5s ease-in-out infinite alternate;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .candle:nth-child(odd)  .flame { animation-duration: 0.4s; }
+    .candle:nth-child(3n)   .flame { animation-duration: 0.6s; }
+    .candle:nth-child(5n)   .flame { animation-duration: 0.35s; }
+
+    @keyframes flicker {
+      0%   { transform: scaleX(1)   scaleY(1)    rotate(-2deg); opacity: 0.95; }
+      50%  { transform: scaleX(0.8) scaleY(1.15) rotate(1deg);  opacity: 1;    }
+      100% { transform: scaleX(1.1) scaleY(0.9)  rotate(2deg);  opacity: 0.9;  }
+    }
+
+    .flame.out {
+      opacity: 0 !important;
+      transform: scaleY(0) !important;
+      animation: none !important;
+    }
+
+    /* Puff particle */
+    .puff {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 8px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: puff-out 0.55s ease-out forwards;
+      z-index: 10;
+    }
+    @keyframes puff-out {
+      0%   { transform: translateX(-50%) scale(0.5); opacity: 0.9; }
+      60%  { transform: translateX(-50%) scale(2.5); opacity: 0.5; }
+      100% { transform: translateX(-50%) scale(4);   opacity: 0;   }
+    }
+
+    /* Candle stick */
+    .candle-stick {
+      width: 8px;
+      height: 28px;
+      border-radius: 3px 3px 2px 2px;
+      position: relative;
+    }
+    /* Alternating candy stripes */
+    .candle:nth-child(1)  .candle-stick { background: linear-gradient(to bottom, #ff80ab, #ff4081); }
+    .candle:nth-child(2)  .candle-stick { background: linear-gradient(to bottom, #ce93d8, #ab47bc); }
+    .candle:nth-child(3)  .candle-stick { background: linear-gradient(to bottom, #80deea, #00acc1); }
+    .candle:nth-child(4)  .candle-stick { background: linear-gradient(to bottom, #ffe082, #ffc107); }
+    .candle:nth-child(5)  .candle-stick { background: linear-gradient(to bottom, #ef9a9a, #e53935); }
+    .candle:nth-child(6)  .candle-stick { background: linear-gradient(to bottom, #a5d6a7, #43a047); }
+    .candle:nth-child(7)  .candle-stick { background: linear-gradient(to bottom, #90caf9, #1e88e5); }
+    .candle:nth-child(8)  .candle-stick { background: linear-gradient(to bottom, #f48fb1, #e91e8c); }
+    .candle:nth-child(9)  .candle-stick { background: linear-gradient(to bottom, #ffcc80, #fb8c00); }
+    .candle:nth-child(10) .candle-stick { background: linear-gradient(to bottom, #b39ddb, #5e35b1); }
+    .candle:nth-child(11) .candle-stick { background: linear-gradient(to bottom, #ff80ab, #ff4081); }
+    .candle:nth-child(12) .candle-stick { background: linear-gradient(to bottom, #ce93d8, #ab47bc); }
+    .candle:nth-child(13) .candle-stick { background: linear-gradient(to bottom, #80deea, #00acc1); }
+    .candle:nth-child(14) .candle-stick { background: linear-gradient(to bottom, #ffe082, #ffc107); }
+    .candle:nth-child(15) .candle-stick { background: linear-gradient(to bottom, #ef9a9a, #e53935); }
+    .candle:nth-child(16) .candle-stick { background: linear-gradient(to bottom, #a5d6a7, #43a047); }
+    .candle:nth-child(17) .candle-stick { background: linear-gradient(to bottom, #90caf9, #1e88e5); }
+    .candle:nth-child(18) .candle-stick { background: linear-gradient(to bottom, #f48fb1, #e91e8c); }
+    .candle:nth-child(19) .candle-stick { background: linear-gradient(to bottom, #ffcc80, #fb8c00); }
+    .candle:nth-child(20) .candle-stick { background: linear-gradient(to bottom, #b39ddb, #5e35b1); }
+
+    /* Wax base */
+    .candle-stick::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px; height: 6px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+    }
+
+    /* ── CAKE LAYERS ── */
+    .cake-body {
+      position: relative;
+      width: 280px;
+    }
+
+    /* TOP LAYER */
+    .cake-top {
+      width: 220px;
+      height: 52px;
+      margin: 0 auto;
+      background: linear-gradient(to bottom, #fff, #fce4ec);
+      border: 2px solid var(--pink-mid);
+      border-radius: 10px 10px 0 0;
+      position: relative;
+      overflow: visible;
+    }
+    /* Frosting drips on top layer */
+    .cake-top::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: 0; right: 0;
+      height: 16px;
+      background:
+        radial-gradient(circle at 10% 100%, #fff 60%, transparent 60%) no-repeat left/28px 16px,
+        radial-gradient(circle at 50% 100%, #fff 60%, transparent 60%) no-repeat center/28px 16px,
+        radial-gradient(circle at 90% 100%, #fff 60%, transparent 60%) no-repeat right/28px 16px;
+      background-color: #fff;
+      border-radius: 8px 8px 0 0;
+    }
+    /* "20" text */
+    .cake-number {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--deep);
+      line-height: 1;
+      text-shadow: 0 1px 3px rgba(181,0,91,0.2);
+    }
+
+    /* MIDDLE LAYER */
+    .cake-mid {
+      width: 250px;
+      height: 60px;
+      margin: 0 auto;
+      background: linear-gradient(to bottom, #f48fb1, #e91e8c);
+      border: 2px solid #c2185b;
+      border-top: none;
+      position: relative;
+      overflow: visible;
+    }
+    .cake-mid::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -2px; right: -2px;
+      height: 18px;
+      background:
+        radial-gradient(circle at 8% 100%, #f8bbd0 55%, transparent 55%),
+        radial-gradient(circle at 20% 100%, #f8bbd0 55%, transparent 55%),
+        radial-gradient(circle at 32% 100%, #f8bbd0 55%, transparent 55%),
+        radial-gradient(circle at 44% 100%, #f8bbd0 55%, transparent 55%),
+        radial-gradient(circle at 56% 100%, #f8bbd0 55%, transparent 55%),
+        radial-gradient(circle at 68% 100%, #f8bbd0 55%, transparent 55%),
+        radial-gradient(circle at 80% 100%, #f8bbd0 55%, transparent 55%),
+        radial-gradient(circle at 92% 100%, #f8bbd0 55%, transparent 55%);
+      background-color: #f8bbd0;
+      border-radius: 8px 8px 0 0;
+    }
+    /* Decorative dots */
+    .cake-mid::after {
+      content: '· · · · · · · ·';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255,255,255,0.5);
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      white-space: nowrap;
+    }
+
+    /* BOTTOM LAYER */
+    .cake-bot {
+      width: 280px;
+      height: 70px;
+      margin: 0 auto;
+      background: linear-gradient(to bottom, #f06292, #c2185b);
+      border: 2px solid #880e4f;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cake-bot::before {
+      content: '';
+      position: absolute;
+      top: -12px; left: -2px; right: -2px;
+      height: 20px;
+      background:
+        radial-gradient(circle at 5%  100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 15% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 25% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 35% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 45% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 55% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 65% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 75% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 85% 100%, #f48fb1 55%, transparent 55%),
+        radial-gradient(circle at 95% 100%, #f48fb1 55%, transparent 55%);
+      background-color: #f48fb1;
+      border-radius: 8px 8px 0 0;
+    }
+    /* Wavy stripe on bottom layer */
+    .cake-bot::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 3px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 2px;
+    }
+
+    /* Cake plate */
+    .cake-plate {
+      width: 300px;
+      height: 12px;
+      background: linear-gradient(to bottom, #fff, #f8bbd0);
+      border: 2px solid var(--pink-mid);
+      border-radius: 0 0 999px 999px;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(181,0,91,0.12);
+    }
+
+    /* ── Wish message ── */
+    .wish-msg {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.6rem;
+      color: var(--deep);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      pointer-events: none;
+    }
+    .wish-msg.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Next button */
+    #next-btn {
+      display: none;
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.65rem 2.2rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(181,0,91,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+    #next-btn:hover { transform: scale(1.06); box-shadow: 0 8px 28px rgba(181,0,91,0.4); }
+
+    .cake-instruction {
+      font-size: 0.75rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--pink-acc);
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="page">
+
+  <!-- ════════ SECTION A — SCRATCH CARD ════════ -->
+  <h2 class="sec-title">Something is hiding here…</h2>
+  <p class="sec-sub">🎴 Scratch to reveal your secret message</p>
+
+  <div class="scratch-zone">
+
+    <div class="scratch-wrapper" id="scratch-wrapper">
+      <!-- Hidden message behind -->
+      <div class="scratch-reveal">
+        <div class="scratch-reveal-emoji">🌸</div>
+        <div class="scratch-reveal-msg">
+          You are the most effortlessly magical person I know —<br>
+          and the world has no idea what's coming next from you. 💗
+        </div>
+      </div>
+      <!-- Scratch canvas on top -->
+      <canvas id="scratch-canvas" width="300" height="180"></canvas>
+    </div>
+
+    <div class="scratch-progress-wrap">
+      <div class="scratch-progress-track">
+        <div class="scratch-progress-fill" id="scratch-fill"></div>
+      </div>
+      <div class="scratch-progress-label" id="scratch-label">0% revealed</div>
+    </div>
+
+    <p class="scratch-hint">🖱 drag your finger (or mouse) to scratch</p>
+    <button id="scratch-reset">✦ Scratch again</button>
+  </div>
+
+  <div class="section-sep">· · · ✿ · · ·</div>
+
+  <!-- ════════ SECTION B — BIRTHDAY CAKE ════════ -->
+  <h2 class="sec-title">Make a wish & blow out your candles</h2>
+  <p class="sec-sub">Click the cake to blow 💨</p>
+
+  <div class="cake-zone">
+    <div class="candle-counter">
+      <strong id="out-count">0</strong> / 20 candles out
+    </div>
+
+    <div class="cake-scene" id="cake-scene">
+
+      <!-- Candles -->
+      <div class="candles-row" id="candles-row"></div>
+
+      <!-- Cake body -->
+      <div class="cake-body">
+        <div class="cake-top"><span class="cake-number">20</span></div>
+        <div class="cake-mid"></div>
+        <div class="cake-bot"></div>
+      </div>
+      <div class="cake-plate"></div>
+
+    </div>
+
+    <p class="cake-instruction" id="cake-instruction">Click the cake to blow out the candles!</p>
+    <div class="wish-msg" id="wish-msg">Your wish is on its way ✨</div>
+    <a id="next-btn" href="page6.html">Continue to the finale →</a>
+  </div>
+
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   CONFETTI ENGINE (shared)
+══════════════════════════════════════════ */
+const cCanvas = document.getElementById('confetti-canvas');
+const cCtx    = cCanvas.getContext('2d');
+cCanvas.width  = window.innerWidth;
+cCanvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  cCanvas.width  = window.innerWidth;
+  cCanvas.height = window.innerHeight;
+});
+
+let confettiPieces = [];
+
+function fireConfetti(x, y, count = 60) {
+  const colors = ['#f48fb1','#e91e8c','#b5005b','#f5c842','#fff','#f8bbd0','#ce93d8'];
+  for (let i = 0; i < count; i++) {
+    confettiPieces.push({
+      x: x ?? (cCanvas.width  * (0.2 + Math.random()*0.6)),
+      y: y ?? (cCanvas.height * 0.3),
+      vx: (Math.random()-0.5)*8,
+      vy: (Math.random()-2)*6,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      w: 6+Math.random()*8,
+      h: 4+Math.random()*6,
+      rot: Math.random()*360,
+      rv: (Math.random()-0.5)*8,
+      life: 1
+    });
+  }
+  if (confettiPieces.length > 0 && !confettiRunning) confettiLoop();
+}
+
+let confettiRunning = false;
+function confettiLoop() {
+  confettiRunning = true;
+  cCtx.clearRect(0,0,cCanvas.width,cCanvas.height);
+  confettiPieces = confettiPieces.filter(p => p.life > 0);
+  for (const p of confettiPieces) {
+    cCtx.save();
+    cCtx.globalAlpha = p.life;
+    cCtx.fillStyle = p.color;
+    cCtx.translate(p.x, p.y);
+    cCtx.rotate(p.rot * Math.PI/180);
+    cCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+    cCtx.restore();
+    p.x  += p.vx;
+    p.y  += p.vy;
+    p.vy += 0.18;
+    p.vx *= 0.99;
+    p.rot += p.rv;
+    p.life -= 0.013;
+  }
+  if (confettiPieces.length > 0) {
+    requestAnimationFrame(confettiLoop);
+  } else {
+    confettiRunning = false;
+    cCtx.clearRect(0,0,cCanvas.width,cCanvas.height);
+  }
+}
+
+/* ══════════════════════════════════════════
+   SECTION A — SCRATCH CARD
+══════════════════════════════════════════ */
+const scratchCanvas  = document.getElementById('scratch-canvas');
+const sCtx           = scratchCanvas.getContext('2d');
+const scratchFill    = document.getElementById('scratch-fill');
+const scratchLabel   = document.getElementById('scratch-label');
+const scratchReset   = document.getElementById('scratch-reset');
+const scratchWrapper = document.getElementById('scratch-wrapper');
+
+let scratching = false;
+let revealed   = false;
+
+function initScratch() {
+  sCtx.clearRect(0,0,300,180);
+  // Draw pink gradient cover layer
+  const grad = sCtx.createLinearGradient(0,0,300,180);
+  grad.addColorStop(0, '#f48fb1');
+  grad.addColorStop(0.5, '#e91e8c');
+  grad.addColorStop(1, '#c2185b');
+  sCtx.fillStyle = grad;
+  sCtx.beginPath();
+  sCtx.roundRect(0,0,300,180,16);
+  sCtx.fill();
+
+  // "SCRATCH ME" text
+  sCtx.fillStyle = 'rgba(255,255,255,0.9)';
+  sCtx.font = "bold 18px 'Poppins', sans-serif";
+  sCtx.textAlign = 'center';
+  sCtx.textBaseline = 'middle';
+  sCtx.fillText('✦  SCRATCH ME  ✦', 150, 80);
+  sCtx.font = "14px 'Poppins', sans-serif";
+  sCtx.fillStyle = 'rgba(255,255,255,0.65)';
+  sCtx.fillText('A secret is waiting…', 150, 110);
+
+  scratchCanvas.style.opacity = '1';
+  scratchCanvas.classList.remove('fading');
+  scratchFill.style.width = '0%';
+  scratchLabel.textContent = '0% revealed';
+  scratchReset.style.display = 'none';
+  revealed = false;
+}
+
+initScratch();
+
+function scratchAt(x, y) {
+  sCtx.globalCompositeOperation = 'destination-out';
+  sCtx.beginPath();
+  sCtx.arc(x, y, 20, 0, Math.PI * 2);
+  sCtx.fill();
+  sCtx.globalCompositeOperation = 'source-over';
+  checkProgress();
+}
+
+function checkProgress() {
+  if (revealed) return;
+  const pixels  = sCtx.getImageData(0,0,300,180).data;
+  let cleared   = 0;
+  const total   = pixels.length / 4;
+  for (let i = 3; i < pixels.length; i += 4) {
+    if (pixels[i] < 128) cleared++;
+  }
+  const pct = Math.round((cleared / total) * 100);
+  scratchFill.style.width = pct + '%';
+  scratchLabel.textContent = pct + '% revealed';
+
+  if (pct >= 65 && !revealed) {
+    revealed = true;
+    completeReveal();
+  }
+}
+
+function completeReveal() {
+  scratchCanvas.classList.add('fading');
+  setTimeout(() => {
+    scratchCanvas.style.display = 'none';
+    fireConfetti(null, scratchWrapper.getBoundingClientRect().top + 90, 50);
+    scratchReset.style.display = 'inline-block';
+    scratchLabel.textContent = '100% revealed 🎉';
+    scratchFill.style.width = '100%';
+  }, 500);
+}
+
+scratchReset.addEventListener('click', () => {
+  scratchCanvas.style.display = 'block';
+  initScratch();
+});
+
+// Mouse events
+scratchCanvas.addEventListener('mousedown', e => { scratching = true; scratchAt(...getPos(e)); });
+scratchCanvas.addEventListener('mousemove', e => { if (scratching) scratchAt(...getPos(e)); });
+scratchCanvas.addEventListener('mouseup',   () => scratching = false);
+scratchCanvas.addEventListener('mouseleave',() => scratching = false);
+
+// Touch events
+scratchCanvas.addEventListener('touchstart', e => { e.preventDefault(); scratchAt(...getPos(e.touches[0])); }, {passive:false});
+scratchCanvas.addEventListener('touchmove',  e => { e.preventDefault(); scratchAt(...getPos(e.touches[0])); }, {passive:false});
+
+function getPos(e) {
+  const rect = scratchCanvas.getBoundingClientRect();
+  const scaleX = 300 / rect.width;
+  const scaleY = 180 / rect.height;
+  return [(e.clientX - rect.left)*scaleX, (e.clientY - rect.top)*scaleY];
+}
+
+/* ══════════════════════════════════════════
+   SECTION B — BIRTHDAY CAKE
+══════════════════════════════════════════ */
+const TOTAL = 20;
+let litCount = TOTAL;
+const candlesRow = document.getElementById('candles-row');
+
+// Build candles
+const candleEls = [];
+for (let i = 0; i < TOTAL; i++) {
+  const c = document.createElement('div');
+  c.className = 'candle';
+  c.innerHTML = `<div class="flame" id="flame-${i}"></div><div class="candle-stick"></div>`;
+  candlesRow.appendChild(c);
+  candleEls.push(c);
+}
+
+const outCountEl = document.getElementById('out-count');
+const wishMsg    = document.getElementById('wish-msg');
+const nextBtn    = document.getElementById('next-btn');
+const instruction= document.getElementById('cake-instruction');
+const cakeScene  = document.getElementById('cake-scene');
+
+function getActiveCandleIndices() {
+  return candleEls
+    .map((c,i) => ({ c, i }))
+    .filter(({ c }) => !c.querySelector('.flame').classList.contains('out'))
+    .map(({ i }) => i);
+}
+
+function blowCandles(count) {
+  const active = getActiveCandleIndices();
+  if (active.length === 0) return;
+
+  const shuffled = active.sort(() => Math.random() - 0.5);
+  const toBlowOut = shuffled.slice(0, Math.min(count, active.length));
+
+  toBlowOut.forEach(idx => {
+    const flame = document.getElementById(`flame-${idx}`);
+    const candle = candleEls[idx];
+
+    // Puff animation
+    const puff = document.createElement('div');
+    puff.className = 'puff';
+    candle.style.position = 'relative';
+    candle.appendChild(puff);
+    setTimeout(() => puff.remove(), 600);
+
+    // Blow out flame
+    flame.classList.add('out');
+    litCount--;
+  });
+
+  outCountEl.textContent = TOTAL - litCount;
+
+  if (litCount === 0) {
+    allCandlesOut();
+  }
+}
+
+function allCandlesOut() {
+  instruction.textContent = '🎉 All candles out! Your wish is flying up!';
+
+  // Shake cake
+  cakeScene.classList.add('shaking');
+  setTimeout(() => cakeScene.classList.remove('shaking'), 700);
+
+  // Fire confetti
+  const rect = cakeScene.getBoundingClientRect();
+  fireConfetti(rect.left + rect.width/2, rect.top + rect.height/2, 100);
+  setTimeout(() => fireConfetti(null, null, 80), 600);
+
+  // Show wish
+  setTimeout(() => wishMsg.classList.add('visible'), 800);
+
+  // Show next button
+  setTimeout(() => { nextBtn.style.display = 'inline-block'; }, 2200);
+}
+
+cakeScene.addEventListener('click', () => {
+  if (litCount === 0) return;
+  // Blow out 2–3 random candles per click
+  const count = litCount === 1 ? 1 : 2 + Math.floor(Math.random()*2);
+  blowCandles(count);
+});
+
+// Touch also works
+cakeScene.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (litCount === 0) return;
+  const count = litCount === 1 ? 1 : 2 + Math.floor(Math.random()*2);
+  blowCandles(count);
+}, {passive:false});
+</script>
+<script src="music.js"></script>
+</body>
+</html>

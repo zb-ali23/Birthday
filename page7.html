@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why You're Amazing 🌸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush:    #fff0f5;
+      --pink-lt:  #f8bbd0;
+      --pink-mid: #f4c0d1;
+      --pink-acc: #d4537e;
+      --deep:     #b5005b;
+      --rose:     #e91e8c;
+      --ink:      #993556;
+      
+      --b1-size: 115px;
+      --b2-size: 135px;
+      --b3-size: 105px;
+      --b4-size: 145px;
+      --b5-size: 100px;
+      --b6-size: 125px;
+      --b7-size: 110px;
+      --b8-size: 150px;
+      --b9-size: 120px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--blush);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #sparkle-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 3.5rem 1rem 6rem;
+    }
+
+    .title-block {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .title-block h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.2rem, 7vw, 3.2rem);
+      color: var(--deep);
+      text-shadow: 0 2px 10px rgba(181,0,91,0.08);
+      margin-bottom: 0.4rem;
+    }
+
+    .title-block p {
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--pink-acc);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* ══ TICKER ══ */
+    .ticker-wrap {
+      background: #fff;
+      border-top: 1.5px solid #f4c0d1;
+      border-bottom: 1.5px solid #f4c0d1;
+      padding: 0.6rem 0;
+      margin: 1.8rem 0 2.5rem;
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+    }
+    .ticker-items {
+      display: inline-block;
+      animation: marquee 22s linear infinite;
+      flex-shrink: 0;
+      min-width: 100%;
+    }
+    .ticker-items span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--pink-acc);
+      margin-right: 1.5rem;
+    }
+    @keyframes marquee {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    /* ══ BUBBLES CONTAINER ══ */
+    .bubbles-container {
+      position: relative;
+      height: 480px;
+      width: 100%;
+      margin: 0 auto 3rem;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 32%, #fffbfd 0%, #ffd6e8 40%, #ff85b3 100%);
+      box-shadow: 0 8px 25px rgba(255,110,180,0.38), inset 0 -4px 10px rgba(181,0,91,0.2), inset 0 4px 10px rgba(255,255,255,0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+      user-select: none;
+    }
+    .bubble:hover {
+      transform: scale(1.08) !important;
+      box-shadow: 0 15px 35px rgba(255,110,180,0.55), inset 0 -4px 12px rgba(181,0,91,0.25), inset 0 4px 12px rgba(255,255,255,0.8);
+      z-index: 15;
+    }
+
+    .bubble-num {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #993556;
+      opacity: 0.8;
+      margin-bottom: 2px;
+    }
+    .bubble-emoji {
+      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+      margin-bottom: 4px;
+    }
+    .bubble-label {
+      font-size: clamp(0.55rem, 2vw, 0.72rem);
+      font-weight: 500;
+      color: var(--deep);
+      text-align: center;
+      max-width: 85%;
+      line-height: 1.1;
+    }
+
+    /* Scatter position definitions with animation keyframes */
+    .b-1 { width: var(--b1-size); height: var(--b1-size); left: 3%; top: 4%; animation: float-1 4.5s ease-in-out infinite; }
+    .b-2 { width: var(--b2-size); height: var(--b2-size); left: 36%; top: 2%; animation: float-2 5.8s ease-in-out infinite 0.2s; }
+    .b-3 { width: var(--b3-size); height: var(--b3-size); left: 74%; top: 8%; animation: float-3 4s ease-in-out infinite 0.5s; }
+    .b-4 { width: var(--b4-size); height: var(--b4-size); left: 14%; top: 38%; animation: float-4 6.2s ease-in-out infinite 0.1s; }
+    .b-5 { width: var(--b5-size); height: var(--b5-size); left: 46%; top: 39%; animation: float-5 5s ease-in-out infinite 0.7s; }
+    .b-6 { width: var(--b6-size); height: var(--b6-size); left: 72%; top: 35%; animation: float-6 4.8s ease-in-out infinite 0.3s; }
+    .b-7 { width: var(--b7-size); height: var(--b7-size); left: 2%; top: 72%; animation: float-7 5.5s ease-in-out infinite 0.9s; }
+    .b-8 { width: var(--b8-size); height: var(--b8-size); left: 36%; top: 68%; animation: float-8 6.5s ease-in-out infinite 0.4s; }
+    .b-9 { width: var(--b9-size); height: var(--b9-size); left: 70%; top: 70%; animation: float-9 5.2s ease-in-out infinite 0.6s; }
+
+    @keyframes float-1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes float-2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-11px); } }
+    @keyframes float-3 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes float-4 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes float-5 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes float-6 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+    @keyframes float-7 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    @keyframes float-8 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+    @keyframes float-9 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    @media (max-width: 500px) {
+      .bubbles-container { height: 380px; }
+      :root {
+        --b1-size: 85px;
+        --b2-size: 100px;
+        --b3-size: 80px;
+        --b4-size: 105px;
+        --b5-size: 75px;
+        --b6-size: 95px;
+        --b7-size: 80px;
+        --b8-size: 110px;
+        --b9-size: 90px;
+      }
+    }
+
+    /* ══ PILLS CONTAINER ══ */
+    .pills-title {
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--pink-acc);
+      margin-bottom: 1.2rem;
+      position: relative;
+    }
+    
+    .pills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      justify-content: center;
+      margin-bottom: 4rem;
+    }
+
+    .pill-card {
+      background: #fff;
+      border: 1.5px solid var(--pink-mid);
+      border-radius: 999px;
+      padding: 0.6rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(181,0,91,0.06);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .pill-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(181,0,91,0.12);
+    }
+
+    .pill-number {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--deep);
+      line-height: 1;
+    }
+
+    .pill-label {
+      font-size: 0.68rem;
+      font-weight: 400;
+      color: var(--pink-acc);
+      letter-spacing: 0.04em;
+    }
+
+    /* ══ CONTINUE BUTTON ══ */
+    .continue-wrap {
+      text-align: center;
+      margin: 2rem 0;
+    }
+    
+    .continue-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      color: #fff;
+      text-decoration: none;
+      padding: 0.75rem 2.4rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      box-shadow: 0 5px 20px rgba(181,0,91,0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: 'Poppins', sans-serif;
+    }
+    .continue-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 8px 28px rgba(181,0,91,0.4);
+    }
+
+    /* ══ OVERLAY ══ */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 180, 210, 0.38);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .overlay.active { opacity: 1; pointer-events: all; }
+
+    .msg-card {
+      background: #fff;
+      border: 2px solid var(--pink-mid);
+      border-radius: 24px;
+      padding: 2.2rem 2rem 1.8rem;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 16px 60px rgba(181,0,91,0.2);
+      transform: scale(0.72) translateY(20px);
+      transition: transform 0.45s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      text-align: center;
+    }
+    .overlay.active .msg-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .card-strip {
+      height: 5px;
+      background: linear-gradient(90deg, #f78fb3, var(--deep));
+      border-radius: 999px;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+    }
+
+    .popup-emoji {
+      font-size: 2.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .popup-reason-num {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--pink-acc);
+      margin-bottom: 0.2rem;
+    }
+
+    .popup-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.8rem;
+      color: var(--deep);
+      margin-bottom: 0.9rem;
+    }
+
+    .popup-desc {
+      font-size: 0.85rem;
+      color: #8a4060;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Close btn */
+    .overlay-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: var(--pink-lt);
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+      z-index: 10;
+    }
+    .overlay-close:hover { background: var(--deep); color: #fff; transform: scale(1.1); }
+  </style>
+</head>
+<body>
+
+  <canvas id="sparkle-canvas"></canvas>
+
+  <div class="page">
+    
+    <div class="title-block">
+      <p>✦ reasons why ✦</p>
+      <h1>Why you're amazing</h1>
+    </div>
+
+    <!-- Ticker -->
+    <div class="ticker-wrap">
+      <div class="ticker-items">
+        <span>💕 Your kindness ✦</span>
+        <span>🌸 Your smile ✦</span>
+        <span>✨ Your laugh ✦</span>
+        <span>🌺 Your heart ✦</span>
+        <span>🎀 Your style ✦</span>
+        <span>💫 Your energy ✦</span>
+        <span>🌷 Your warmth ✦</span>
+        <span>🌟 Your dreams ✦</span>
+        <span>🎶 Your joy ✦</span>
+      </div>
+      <div class="ticker-items">
+        <span>💕 Your kindness ✦</span>
+        <span>🌸 Your smile ✦</span>
+        <span>✨ Your laugh ✦</span>
+        <span>🌺 Your heart ✦</span>
+        <span>🎀 Your style ✦</span>
+        <span>💫 Your energy ✦</span>
+        <span>🌷 Your warmth ✦</span>
+        <span>🌟 Your dreams ✦</span>
+        <span>🎶 Your joy ✦</span>
+      </div>
+    </div>
+
+    <!-- Bubbles scattered inside container -->
+    <div class="bubbles-container">
+      
+      <!-- Bubble 1 -->
+      <div class="bubble b-1" data-reason="1">
+        <span class="bubble-num">#1</span>
+        <span class="bubble-emoji">💕</span>
+        <span class="bubble-label">Kindness</span>
+      </div>
+
+      <!-- Bubble 2 -->
+      <div class="bubble b-2" data-reason="2">
+        <span class="bubble-num">#2</span>
+        <span class="bubble-emoji">🌸</span>
+        <span class="bubble-label">Smile</span>
+      </div>
+
+      <!-- Bubble 3 -->
+      <div class="bubble b-3" data-reason="3">
+        <span class="bubble-num">#3</span>
+        <span class="bubble-emoji">✨</span>
+        <span class="bubble-label">Laugh</span>
+      </div>
+
+      <!-- Bubble 4 -->
+      <div class="bubble b-4" data-reason="4">
+        <span class="bubble-num">#4</span>
+        <span class="bubble-emoji">🌺</span>
+        <span class="bubble-label">Heart</span>
+      </div>
+
+      <!-- Bubble 5 -->
+      <div class="bubble b-5" data-reason="5">
+        <span class="bubble-num">#5</span>
+        <span class="bubble-emoji">🎀</span>
+        <span class="bubble-label">Style</span>
+      </div>
+
+      <!-- Bubble 6 -->
+      <div class="bubble b-6" data-reason="6">
+        <span class="bubble-num">#6</span>
+        <span class="bubble-emoji">💫</span>
+        <span class="bubble-label">Energy</span>
+      </div>
+
+      <!-- Bubble 7 -->
+      <div class="bubble b-7" data-reason="7">
+        <span class="bubble-num">#7</span>
+        <span class="bubble-emoji">🌷</span>
+        <span class="bubble-label">Warmth</span>
+      </div>
+
+      <!-- Bubble 8 -->
+      <div class="bubble b-8" data-reason="8">
+        <span class="bubble-num">#8</span>
+        <span class="bubble-emoji">🌟</span>
+        <span class="bubble-label">Dreams</span>
+      </div>
+
+      <!-- Bubble 9 -->
+      <div class="bubble b-9" data-reason="9">
+        <span class="bubble-num">#9</span>
+        <span class="bubble-emoji">🎶</span>
+        <span class="bubble-label">Joy</span>
+      </div>
+
+    </div>
+
+    <div class="pills-title">✦ the journey so far ✦</div>
+
+    <!-- Counting Pills -->
+    <div class="pills-container">
+      <div class="pill-card">
+        <div class="pill-number" data-target="4">0</div>
+        <div class="pill-label">Months known</div>
+      </div>
+      <div class="pill-card">
+        <div class="pill-number">∞</div>
+        <div class="pill-label">Memories made</div>
+      </div>
+      <div class="pill-card">
+        <div class="pill-number">Countless</div>
+        <div class="pill-label">Inside jokes</div>
+      </div>
+      <div class="pill-card">
+        <div class="pill-number">∞</div>
+        <div class="pill-label">More to come</div>
+      </div>
+    </div>
+
+    <!-- Continue button -->
+    <div class="continue-wrap">
+      <a href="page8.html" class="continue-btn">Continue to the Finale 🎁</a>
+    </div>
+
+  </div>
+
+  <!-- Overlay/Popup Card -->
+  <div class="overlay" id="overlay">
+    <div class="msg-card">
+      <button class="overlay-close" id="overlay-close" aria-label="Close">✕</button>
+      <div class="card-strip"></div>
+      <div class="popup-emoji" id="popup-emoji">💕</div>
+      <div class="popup-reason-num" id="popup-reason-num">Reason #1</div>
+      <h3 class="popup-title" id="popup-title">Your kindness</h3>
+      <p class="popup-desc" id="popup-desc">Reason detail paragraph...</p>
+    </div>
+  </div>
+
+  <script>
+    // Reasons data
+    const REASONS = {
+      1: {
+        emoji: "💕",
+        title: "Your kindness",
+        desc: "The way you look out for everyone around you, always offering a helping hand or a warm word when someone needs it most. Your gentle soul makes the world a softer, better place."
+      },
+      2: {
+        emoji: "🌸",
+        title: "Your smile",
+        desc: "A single smile from you can instantly brighten up the darkest room. It's contagious, pure, and carries a warmth that makes everyone feel instantly at home."
+      },
+      3: {
+        emoji: "✨",
+        title: "Your laugh",
+        desc: "That sweet, musical sound that fills the room with pure light. Hearing you laugh is one of the absolute best parts of any day—it's magic in its purest form."
+      },
+      4: {
+        emoji: "🌺",
+        title: "Your heart",
+        desc: "You care so deeply and love so unconditionally. Your heart is a rare sanctuary of empathy, always finding space to understand, support, and lift others up."
+      },
+      5: {
+        emoji: "🎀",
+        title: "Your style",
+        desc: "Effortlessly elegant, uniquely yours, and always carrying a touch of grace. You bring a beautiful aesthetic and vibrant personality to everything you wear and do."
+      },
+      6: {
+        emoji: "💫",
+        title: "Your energy",
+        desc: "Magnetic, positive, and full of life. You have this incredible ability to lift the spirits of anyone you talk to, leaving a trail of inspiration wherever you go."
+      },
+      7: {
+        emoji: "🌷",
+        title: "Your warmth",
+        desc: "Like a cozy blanket on a cold day, your presence is comforting and calming. You make people feel safe, listened to, and deeply valued."
+      },
+      8: {
+        emoji: "🌟",
+        title: "Your dreams",
+        desc: "Your ambition and the beautiful way you look at the future. You strive for greatness with such determination and passion, and it is a joy to watch you shine."
+      },
+      9: {
+        emoji: "🎶",
+        title: "Your joy",
+        desc: "You find beauty in the little things and spread happiness wherever you go. Your enthusiasm for life is a reminder of how beautiful the world can be."
+      }
+    };
+
+    // Overlay elements
+    const overlay = document.getElementById('overlay');
+    const popupEmoji = document.getElementById('popup-emoji');
+    const popupReasonNum = document.getElementById('popup-reason-num');
+    const popupTitle = document.getElementById('popup-title');
+    const popupDesc = document.getElementById('popup-desc');
+    const overlayClose = document.getElementById('overlay-close');
+
+    // Click handler for bubbles
+    document.querySelectorAll('.bubble').forEach(bubble => {
+      bubble.addEventListener('click', () => {
+        const id = bubble.getAttribute('data-reason');
+        const data = REASONS[id];
+        
+        popupEmoji.textContent = data.emoji;
+        popupReasonNum.textContent = `Reason #${id}`;
+        popupTitle.textContent = data.title;
+        popupDesc.textContent = data.desc;
+        
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    // Close overlay
+    function closeOverlay() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    overlayClose.addEventListener('click', closeOverlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('active')) closeOverlay();
+    });
+
+    // Sparkles canvas
+    (function () {
+      const canvas = document.getElementById('sparkle-canvas');
+      const ctx = canvas.getContext('2d');
+      let W = canvas.width = window.innerWidth;
+      let H = canvas.height = window.innerHeight;
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+
+      const particles = Array.from({length: 40}, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: 1.5 + Math.random() * 3,
+        a: 0.1 + Math.random() * 0.4,
+        da: (Math.random() > 0.5 ? 1 : -1) * 0.005,
+        dx: (Math.random() - 0.5) * 0.4,
+        dy: -0.2 - Math.random() * 0.4,
+      }));
+
+      function frame() {
+        ctx.clearRect(0,0,W,H);
+        for (const p of particles) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0.05, Math.min(0.6, p.a));
+          ctx.fillStyle = '#f48fb1';
+          ctx.beginPath();
+          const s = p.r;
+          ctx.moveTo(p.x, p.y - s*2);
+          ctx.lineTo(p.x + s*0.5, p.y - s*0.5);
+          ctx.lineTo(p.x + s*2, p.y);
+          ctx.lineTo(p.x + s*0.5, p.y + s*0.5);
+          ctx.lineTo(p.x, p.y + s*2);
+          ctx.lineTo(p.x - s*0.5, p.y + s*0.5);
+          ctx.lineTo(p.x - s*2, p.y);
+          ctx.lineTo(p.x - s*0.5, p.y - s*0.5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+
+          p.x += p.dx; p.y += p.dy; p.a += p.da;
+          if (p.a > 0.6 || p.a < 0.05) p.da *= -1;
+          if (p.x < 0) p.x = W;
+          if (p.x > W) p.x = 0;
+          if (p.y < 0) { p.y = H; p.x = Math.random() * W; }
+        }
+        requestAnimationFrame(frame);
+      }
+      frame();
+    })();
+
+    // Counting pills interaction
+    const pillObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const numEl = entry.target.querySelector('.pill-number');
+          const targetStr = numEl ? numEl.getAttribute('data-target') : null;
+          if (numEl && targetStr && !numEl.classList.contains('counted')) {
+            numEl.classList.add('counted');
+            const target = parseInt(targetStr);
+            let count = 0;
+            const duration = 1500;
+            const step = Math.max(Math.floor(duration / target), 10);
+            const increment = Math.ceil(target / (duration / step));
+            
+            const timer = setInterval(() => {
+              count += increment;
+              if (count >= target) {
+                numEl.textContent = target + (target === 500 ? '+' : '');
+                clearInterval(timer);
+              } else {
+                numEl.textContent = count;
+              }
+            }, step);
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.pill-card').forEach(card => pillObserver.observe(card));
+  </script>
+  <script src="music.js"></script>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letters from Zohaib 💌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blush:     #fff0f5;
+      --pink-lt:   #f8bbd0;
+      --pink-mid:  #f4c0d1;
+      --pink-acc:  #d4537e;
+      --deep:      #b5005b;
+      --seal:      #e91e8c;
+      --gold:      #c9a84c;
+      --ink:       #993556;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--blush);
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #heart-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══ PAGE ══ */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 6rem;
+    }
+
+    /* ══ TITLE ══ */
+    .title-block {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .title-block .from-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.28rem 1rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    .title-block h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 6vw, 3rem);
+      color: var(--deep);
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .title-block p {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+      font-size: 0.82rem;
+      color: var(--pink-acc);
+      letter-spacing: 0.04em;
+    }
+
+    /* ══ INSTRUCTION HINT ══ */
+    .hint {
+      text-align: center;
+      margin: 1.6rem 0 2.8rem;
+      font-size: 0.75rem;
+      color: var(--pink-acc);
+      font-weight: 300;
+      letter-spacing: 0.06em;
+    }
+    .hint span {
+      display: inline-block;
+      animation: bounce-hint 1.4s ease-in-out infinite;
+    }
+    @keyframes bounce-hint {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-4px); }
+    }
+
+    /* ══ ENVELOPES — vertical story ══ */
+    .env-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 2.2rem;
+      align-items: center;
+    }
+
+    /* Each row: number + envelope + label */
+    .env-row {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      width: 100%;
+      max-width: 520px;
+    }
+    .env-row.flip-row {
+      flex-direction: row-reverse;
+    }
+
+    .env-number {
+      font-family: 'Dancing Script', cursive;
+      font-size: 3rem;
+      color: var(--pink-mid);
+      min-width: 2.2rem;
+      text-align: center;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color 0.4s;
+    }
+    .env-row.opened-row .env-number { color: var(--deep); }
+
+    /* ── Envelope ── */
+    .envelope {
+      position: relative;
+      width: 180px;
+      height: 118px;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: filter 0.3s;
+    }
+    .envelope:hover { filter: drop-shadow(0 6px 18px rgba(181,0,91,0.22)); }
+
+    .env-body {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      border: 2px solid var(--pink-mid);
+      border-radius: 8px;
+      overflow: hidden;
+      z-index: 1;
+      transition: border-color 0.4s, box-shadow 0.4s;
+    }
+    /* V-shape bottom fold */
+    .env-body::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60%;
+      background:
+        linear-gradient(135deg, transparent 49.5%, var(--pink-mid) 49.5% 50.5%, transparent 50.5%),
+        linear-gradient(225deg, transparent 49.5%, var(--pink-mid) 49.5% 50.5%, transparent 50.5%);
+    }
+
+    .env-flap-wrap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 54%;
+      perspective: 500px;
+      z-index: 3;
+    }
+    .env-flap {
+      width: 100%;
+      height: 100%;
+      background: var(--pink-lt);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+      backface-visibility: hidden;
+      border-radius: 8px 8px 0 0;
+    }
+    .envelope.opened .env-flap { transform: rotateX(-180deg); }
+
+    .env-letter {
+      position: absolute;
+      bottom: 10px;
+      left: 12%;
+      width: 76%;
+      height: 58%;
+      background: linear-gradient(150deg, #fff 75%, #fde8f0);
+      border: 1px solid var(--pink-mid);
+      border-radius: 4px;
+      z-index: 2;
+      transform: translateY(0);
+      transition: transform 0.5s 0.38s cubic-bezier(.2,.8,.4,1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+    .envelope.opened .env-letter { transform: translateY(-52%); opacity: 1; }
+
+    .env-seal {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px; height: 32px;
+      background: var(--seal);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.85rem;
+      z-index: 5;
+      box-shadow: 0 2px 8px rgba(233,30,140,0.45);
+      transition: opacity 0.25s 0.1s, transform 0.25s 0.1s;
+    }
+    .envelope.opened .env-seal {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    .env-read-dot {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 20px; height: 20px;
+      background: var(--deep);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.55rem;
+      z-index: 6;
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.3s 1s, transform 0.4s 1s cubic-bezier(.34,1.56,.64,1);
+    }
+    .envelope.read .env-read-dot { opacity: 1; transform: scale(1); }
+
+    /* envelope body colour shift when opened */
+    .envelope.opened .env-body {
+      border-color: var(--deep);
+      box-shadow: 0 4px 22px rgba(181,0,91,0.14);
+    }
+
+    /* ── Label beside envelope ── */
+    .env-label {
+      flex: 1;
+    }
+    .env-label-tag {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--pink-mid);
+      margin-bottom: 0.3rem;
+      transition: color 0.4s;
+    }
+    .env-row.opened-row .env-label-tag { color: var(--pink-acc); }
+    .env-label-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.25rem;
+      color: var(--deep);
+      line-height: 1.2;
+    }
+    .env-label-hint {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 300;
+      color: var(--pink-acc);
+      margin-top: 0.25rem;
+      font-style: italic;
+    }
+
+    /* ══ PROGRESS ══ */
+    .progress-row {
+      text-align: center;
+      margin: 2.5rem 0 0;
+    }
+    .progress-text {
+      font-size: 0.7rem;
+      color: var(--pink-acc);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+    .progress-track {
+      width: 180px;
+      height: 5px;
+      background: #fce4ec;
+      border-radius: 999px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f78fb3, var(--deep));
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.6s ease;
+    }
+
+    /* ══ BONUS ENVELOPE ══ */
+    .bonus-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.9rem;
+      margin-top: 3.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(40px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .bonus-section.revealed {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+    .bonus-eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 400;
+    }
+    .bonus-link {
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .bonus-env {
+      position: relative;
+      width: 200px;
+      height: 130px;
+    }
+    .bonus-body {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #fffbee, #fff3cc);
+      border: 2.5px solid var(--gold);
+      border-radius: 10px;
+      box-shadow: 0 6px 28px rgba(201,168,76,0.3);
+      animation: gold-glow 2.2s ease-in-out infinite;
+    }
+    @keyframes gold-glow {
+      0%,100% { box-shadow: 0 6px 28px rgba(201,168,76,0.3), 0 0 0 0 rgba(201,168,76,0.35); }
+      55%      { box-shadow: 0 6px 28px rgba(201,168,76,0.3), 0 0 0 12px rgba(201,168,76,0); }
+    }
+    .bonus-flap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 52%;
+      background: linear-gradient(160deg, #f5e6c0, #e8c96a);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      border-radius: 10px 10px 0 0;
+      z-index: 2;
+    }
+    .bonus-seal {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--gold), #e8a800);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      z-index: 3;
+      box-shadow: 0 2px 10px rgba(201,168,76,0.6);
+    }
+    .bonus-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.6rem;
+      color: var(--gold);
+    }
+    .bonus-sub {
+      font-size: 0.72rem;
+      color: var(--gold);
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+    }
+
+    /* ══ OVERLAY ══ */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 180, 210, 0.38);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .overlay.active { opacity: 1; pointer-events: all; }
+
+    .msg-card {
+      background: #fff;
+      border: 2px solid var(--pink-mid);
+      border-radius: 24px;
+      padding: 2rem 2rem 1.7rem;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 16px 60px rgba(181,0,91,0.2);
+      transform: scale(0.72) translateY(20px);
+      transition: transform 0.45s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .overlay.active .msg-card {
+      transform: scale(1) translateY(0);
+    }
+
+    /* Card top strip */
+    .card-strip {
+      height: 5px;
+      background: linear-gradient(90deg, #f78fb3, var(--deep));
+      border-radius: 999px;
+      margin-bottom: 1.4rem;
+    }
+
+    .card-from {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+    .card-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      box-shadow: 0 3px 12px rgba(181,0,91,0.25);
+    }
+    .card-from-text {}
+    .card-from-name {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.4rem;
+      color: var(--deep);
+      line-height: 1;
+    }
+    .card-from-sub {
+      font-size: 0.65rem;
+      color: var(--pink-acc);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+    }
+
+    .card-chapter {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pink-mid);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.45rem;
+      color: var(--deep);
+      margin-bottom: 0.9rem;
+      line-height: 1.25;
+    }
+
+    .card-divider {
+      width: 36px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--pink-mid), transparent);
+      margin: 0 auto 1rem 0;
+      border-radius: 2px;
+    }
+
+    .card-text {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 300;
+      font-size: 0.81rem;
+      color: var(--ink);
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+    }
+    .card-text em {
+      font-style: italic;
+      color: var(--deep);
+    }
+
+    .card-close {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, #f78fb3, var(--deep));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.6rem 1.5rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(181,0,91,0.28);
+    }
+    .card-close:hover { transform: scale(1.04); box-shadow: 0 6px 22px rgba(181,0,91,0.4); }
+
+    /* Scrollbar inside card */
+    .msg-card::-webkit-scrollbar { width: 4px; }
+    .msg-card::-webkit-scrollbar-track { background: transparent; }
+    .msg-card::-webkit-scrollbar-thumb { background: var(--pink-mid); border-radius: 4px; }
+
+    @media (max-width: 560px) {
+      .env-row { gap: 0.9rem; }
+      .envelope { width: 140px; height: 92px; }
+      .env-number { font-size: 2.2rem; min-width: 1.8rem; }
+      .env-label-title { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="heart-canvas"></canvas>
+
+<div class="page">
+
+  <!-- TITLE -->
+  <div class="title-block">
+    <div class="from-tag">✦ From Zohaib — With Everything ✦</div>
+    <h1>Khizra, I wrote you six letters.</h1>
+    <p>Open them one by one. In order. Don't skip. 💌</p>
+  </div>
+
+  <div class="hint"><span>👇</span> tap each envelope to read</div>
+
+  <!-- ENVELOPES -->
+  <div class="env-stack" id="env-stack"></div>
+
+  <!-- PROGRESS -->
+  <div class="progress-row">
+    <div class="progress-text" id="prog-text">0 of 6 letters read</div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+  </div>
+
+  <!-- BONUS 7TH -->
+  <div class="bonus-section" id="bonus">
+    <div class="bonus-eyebrow">✦ and one last thing ✦</div>
+    <a class="bonus-link" href="page5.html">
+      <div class="bonus-env">
+        <div class="bonus-body"></div>
+        <div class="bonus-flap"></div>
+        <div class="bonus-seal">✦</div>
+      </div>
+      <div class="bonus-title">One more thing…</div>
+      <div class="bonus-sub">open to continue →</div>
+    </a>
+  </div>
+
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="msg-card" id="msg-card">
+    <div class="card-strip"></div>
+    <div class="card-from">
+      <div class="card-avatar" id="card-avatar"></div>
+      <div class="card-from-text">
+        <div class="card-from-name">Zohaib</div>
+        <div class="card-from-sub" id="card-sub"></div>
+      </div>
+    </div>
+    <div class="card-chapter" id="card-chapter"></div>
+    <div class="card-title" id="card-title"></div>
+    <div class="card-divider"></div>
+    <p class="card-text" id="card-text"></p>
+    <button class="card-close" id="card-close">Seal it back 💌</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   THE SIX LETTERS — all from Zohaib
+══════════════════════════════════════════════ */
+const LETTERS = [
+  {
+    seal: "💖",
+    tag: "Letter I",
+    envTitle: "Sweet & Heartfelt",
+    envHint: "Start here",
+    chapter: "Letter 1",
+    title: "Sweet & Heartfelt",
+    message: `Dear Khizra,\n\nHappy Birthday! 🎉\n\nToday is all about celebrating someone who has brought so much happiness into my life. Thank you for being such an amazing friend, for listening to me, supporting me, and making even ordinary days feel special.\n\nI hope this year brings you endless smiles, good health, success in everything you dream of, and countless beautiful memories. Never stop being the kind, caring, and wonderful person you are.\n\nHappy Birthday once again! May Allah bless you with a long, happy, and peaceful life. I'm truly grateful to have you as my best friend.\n\nWith lots of love, ❤️`
+  },
+  {
+    seal: "🥺",
+    tag: "Letter II",
+    envTitle: "Emotional",
+    envHint: "The honest one",
+    chapter: "Letter 2",
+    title: "Emotional",
+    message: `Dear Khizra,\n\nHappy Birthday to the person who knows me better than almost anyone. Through happy moments and difficult days, you've always been there, and I'll always be thankful for your friendship.\n\nLife changes, people come and go, but I sincerely hope our friendship stays strong forever. You deserve every happiness because your heart is full of kindness.\n\nMay Allah fill your life with peace, love, endless blessings, and success. I pray every wish you make today comes true.\n\nHappy Birthday, my dear friend. You mean more than words can express.`
+  },
+  {
+    seal: "😂",
+    tag: "Letter III",
+    envTitle: "Funny & Cute",
+    envHint: "A good laugh",
+    chapter: "Letter 3",
+    title: "Funny & Cute",
+    message: `Dear Khizra,\n\nHappy Birthday! 😂🎂\n\nCongratulations! You're officially one year older... but don't worry, you're still younger than you'll be next year!\n\nThank you for putting up with my nonsense and still choosing to be my best friend. That's a true achievement! I hope your day is filled with laughter, delicious cake, lots of gifts, and zero stress.\n\nMay Allah bless you with happiness, success, and enough patience to continue being my friend. 😄\n\nEnjoy your special day—you deserve every bit of it!`
+  },
+  {
+    seal: "🤲",
+    tag: "Letter IV",
+    envTitle: "Prayer-Filled",
+    envHint: "My prayers for you",
+    chapter: "Letter 4",
+    title: "Prayer-Filled",
+    message: `Dear Khizra,\n\nOn your birthday, my biggest gift to you is my heartfelt prayers.\n\nMay Allah always protect you from every hardship, guide you toward what is best, fill your heart with peace, and bless you with endless happiness. May He grant you success in your studies, career, and every dream you carry in your heart.\n\nMay your smile never fade, your heart remain full of hope, and your faith grow stronger with every passing year.\n\nHappy Birthday! May Allah accept all your duas and make this year your best one yet.\n\nAmeen. ❤️`
+  },
+  {
+    seal: "✨",
+    tag: "Letter V",
+    envTitle: "Short & Meaningful",
+    envHint: "The sweet one",
+    chapter: "Letter 5",
+    title: "Short & Meaningful",
+    message: `Dear Khizra,\n\nHappy Birthday! 🎉\n\nSome people enter our lives and make everything brighter. You're one of those people for me.\n\nThank you for your kindness, your laughter, and your friendship. I hope this new year of your life is filled with beautiful moments, exciting opportunities, and endless happiness.\n\nStay exactly the way you are because you're truly special.\n\nWishing you a birthday as wonderful as you are.`
+  },
+  {
+    seal: "♾️",
+    tag: "Letter VI",
+    envTitle: "Best Friend Forever",
+    envHint: "The final letter",
+    chapter: "Letter 6",
+    title: "Best Friend Forever",
+    message: `Dear Khizra,\n\nHappy Birthday! 🎂❤️\n\nI don't say this often, but I want you to know how much I appreciate having you in my life. Thank you for every conversation, every laugh, every piece of advice, and every memory we've created together.\n\nNo matter where life takes us, I hope we'll always remain friends. I promise to cheer for your successes, support you through challenges, and celebrate every milestone with you.\n\nYou deserve all the love, happiness, and success in the world. May Allah bless you abundantly, keep you safe, and make every day of your life brighter than the last.\n\nHappy Birthday once again. Thank you for being my best friend. I pray that our friendship continues for many years to come.\n\nWith love and best wishes,\nYour Best  Zohaib  ❤️`
+  }
+];
+
+/* ══ BUILD ENVELOPES ══ */
+const stack = document.getElementById('env-stack');
+let openedCount = 0;
+
+LETTERS.forEach((letter, i) => {
+  const isFlipped = i % 2 === 1;
+  const row = document.createElement('div');
+  row.className = `env-row${isFlipped ? ' flip-row' : ''}`;
+
+  row.innerHTML = `
+    <div class="env-number">${String(i+1).padStart(2,'0')}</div>
+    <div class="envelope" id="env-${i}" tabindex="0" role="button" aria-label="Open ${letter.tag}">
+      <div class="env-body"></div>
+      <div class="env-flap-wrap"><div class="env-flap"></div></div>
+      <div class="env-letter">${letter.seal}</div>
+      <div class="env-seal">♥</div>
+      <div class="env-read-dot">✓</div>
+    </div>
+    <div class="env-label">
+      <div class="env-label-tag">${letter.tag}</div>
+      <div class="env-label-title">${letter.envTitle}</div>
+      <div class="env-label-hint">${letter.envHint}</div>
+    </div>
+  `;
+
+  function openLetter() {
+    const env = document.getElementById(`env-${i}`);
+    const alreadyOpen = env.classList.contains('opened');
+
+    if (!alreadyOpen) {
+      env.classList.add('opened');
+      setTimeout(() => {
+        env.classList.add('read');
+        row.classList.add('opened-row');
+        openedCount++;
+        updateProgress();
+        if (openedCount === LETTERS.length) revealBonus();
+      }, 950);
+    }
+
+    setTimeout(() => showCard(letter), alreadyOpen ? 0 : 680);
+  }
+
+  row.querySelector('.envelope').addEventListener('click', openLetter);
+  row.querySelector('.envelope').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') openLetter();
+  });
+
+  stack.appendChild(row);
+});
+
+/* ══ PROGRESS ══ */
+function updateProgress() {
+  document.getElementById('prog-text').textContent = `${openedCount} of ${LETTERS.length} letters read`;
+  document.getElementById('prog-fill').style.width = `${(openedCount / LETTERS.length) * 100}%`;
+}
+
+/* ══ OVERLAY ══ */
+const overlay = document.getElementById('overlay');
+
+function showCard(letter) {
+  document.getElementById('card-avatar').textContent = letter.seal;
+  document.getElementById('card-sub').textContent     = 'just for you · written with care';
+  document.getElementById('card-chapter').textContent = letter.chapter;
+  document.getElementById('card-title').textContent   = letter.title;
+
+  // Render newlines + <em> tags safely
+  const raw = letter.message.replace(/\n/g, '<br>');
+  document.getElementById('card-text').innerHTML = raw;
+
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCard() {
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('card-close').addEventListener('click', closeCard);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeCard(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCard(); });
+
+/* ══ BONUS ══ */
+function revealBonus() {
+  const b = document.getElementById('bonus');
+  b.classList.add('revealed');
+  setTimeout(() => b.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+}
+
+/* ══ HEART PARTICLES ══ */
+(function () {
+  const canvas = document.getElementById('heart-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, pts = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  const COLORS = ['#f48fb1','#f06292','#e91e8c','#fce4ec','#f8bbd0','#f78fb3'];
+
+  function mkPt() {
+    return {
+      x: rand(0, W), y: rand(H + 20, H + 100),
+      s: rand(7, 17), sp: rand(0.4, 1.2),
+      a: rand(0.2, 0.65), wb: rand(0, Math.PI*2),
+      ws: rand(0.008, 0.025),
+      c: COLORS[Math.floor(rand(0, COLORS.length))]
+    };
+  }
+
+  for (let i = 0; i < 28; i++) {
+    const p = mkPt();
+    p.y = rand(0, H);
+    pts.push(p);
+  }
+
+  function heart(x, y, s, c, a) {
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x,y-s*.3, x-s*.5,y-s*.8, x-s*.5,y-s*.5);
+    ctx.bezierCurveTo(x-s*.5,y-s*1.1, x,y-s*1.1, x,y-s*.75);
+    ctx.bezierCurveTo(x,y-s*1.1, x+s*.5,y-s*1.1, x+s*.5,y-s*.5);
+    ctx.bezierCurveTo(x+s*.5,y-s*.8, x,y-s*.3, x,y);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of pts) {
+      p.wb += p.ws;
+      p.x  += Math.sin(p.wb) * 0.7;
+      p.y  -= p.sp;
+      if (p.y < -30) Object.assign(p, mkPt());
+      heart(p.x, p.y, p.s, p.c, p.a);
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+<script src="music.js"></script>
+</body>
+</html>

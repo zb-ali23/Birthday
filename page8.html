@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Grand Finale 🎁</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      background: #0d0010;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* ── PAGE TRANSITION ── */
+    .page-fade {
+      position: fixed;
+      inset: 0;
+      background: #0d0010;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    .page-fade.out {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #fireworks-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.2rem;
+    }
+
+    /* ── GIFT BOX DESIGN ── */
+    .gift-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 300px;
+      margin-bottom: 2rem;
+    }
+
+    .one-last-thing {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 6vw, 2.7rem);
+      color: #fff;
+      margin-bottom: 2.2rem;
+      text-shadow: 0 0 15px rgba(255,255,255,0.4);
+      transition: opacity 0.5s ease;
+      z-index: 12;
+      text-align: center;
+    }
+
+    .birthday-text {
+      position: absolute;
+      top: -30px;
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.1rem, 6vw, 3.4rem);
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+      opacity: 0;
+      transform: scale(0) translateY(40px);
+      transition: opacity 0.65s, transform 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 15;
+    }
+    .birthday-text.erupt {
+      opacity: 1;
+      transform: scale(1) translateY(-20px);
+    }
+
+    .color-cycle {
+      animation: cycleColor 3s linear infinite;
+    }
+    @keyframes cycleColor {
+      0%, 100% {
+        color: #ff69b4;
+        text-shadow: 0 0 12px rgba(255,105,180,0.8), 0 0 25px rgba(255,105,180,0.4);
+      }
+      33% {
+        color: #ff1493;
+        text-shadow: 0 0 12px rgba(255,20,147,0.8), 0 0 25px rgba(255,20,147,0.4);
+      }
+      66% {
+        color: #ff85b3;
+        text-shadow: 0 0 12px rgba(255,133,179,0.8), 0 0 25px rgba(255,133,179,0.4);
+      }
+    }
+
+    .box-wrapper {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      cursor: pointer;
+      animation: pulseBox 2s ease-in-out infinite;
+      z-index: 10;
+    }
+    @keyframes pulseBox {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .box-body {
+      position: absolute;
+      width: 130px;
+      height: 110px;
+      background: #e91e8c;
+      bottom: 0;
+      left: 10px;
+      border-radius: 8px;
+      box-shadow: 0 12px 30px rgba(233,30,140,0.35), inset 0 -8px 20px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .box-lid {
+      position: absolute;
+      width: 150px;
+      height: 32px;
+      background: #c2185b;
+      bottom: 110px;
+      left: 0;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.5s cubic-bezier(.175, .885, .32, 1.275), opacity 0.5s;
+      z-index: 2;
+    }
+
+    /* Ribbons */
+    .body-ribbon {
+      position: absolute;
+      background: #fff;
+      width: 22px;
+      height: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 4px rgba(0,0,0,0.08);
+    }
+    .lid-ribbon {
+      position: absolute;
+      background: #fff;
+      width: 22px;
+      height: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Bows */
+    .bow-wrap {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 66px;
+      height: 18px;
+      z-index: 3;
+      transition: transform 0.5s ease, opacity 0.5s;
+    }
+    .bow-left, .bow-right {
+      position: absolute;
+      width: 30px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .bow-left {
+      left: 4px;
+      transform: rotate(-25deg);
+    }
+    .bow-right {
+      right: 4px;
+      transform: rotate(25deg);
+    }
+
+    /* Exploded state styles */
+    .exploded .box-lid {
+      transform: translateY(-200px) rotate(20deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .exploded .bow-wrap {
+      transform: translateY(-200px) rotate(-15deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .exploded .box-wrapper {
+      animation: none;
+      cursor: default;
+    }
+
+    /* ── VOICE PLAYER ── */
+    .voice-player {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 95%;
+      max-width: 380px;
+      margin: 1.5rem auto 0;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10;
+      position: relative;
+    }
+    .voice-player.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .play-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #e91e8c;
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(233, 30, 140, 0.4);
+      transition: transform 0.2s, background-color 0.2s;
+      flex-shrink: 0;
+    }
+    .play-btn:hover {
+      transform: scale(1.06);
+      background: #ff1493;
+    }
+    .waveform-wrap {
+      flex-grow: 1;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .waveform-bars {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      width: 100%;
+    }
+    .w-bar {
+      width: 3px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 2px;
+      transition: height 0.08s ease, background-color 0.3s;
+    }
+    .voice-player.playing .w-bar {
+      background: #e91e8c;
+    }
+    .voice-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .voice-title {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.5);
+      font-weight: 300;
+      letter-spacing: 0.04em;
+    }
+    .voice-time {
+      font-size: 0.75rem;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* ── FINAL MESSAGE CARD ── */
+    .message-card-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      margin: 2.2rem auto 0;
+      opacity: 0;
+      transform: translateY(60px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10;
+    }
+    .message-card-wrap.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .message-card {
+      background: #fff;
+      border: 3px solid #ffb6c1;
+      border-radius: 24px;
+      padding: 2.2rem 2.2rem 1.8rem;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+      text-align: center;
+      position: relative;
+    }
+    .message-card::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border: 1.5px dashed #d4537e;
+      border-radius: 28px;
+      pointer-events: none;
+    }
+    .message-card p {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.25rem, 4.5vw, 1.6rem);
+      color: #8a4060;
+      line-height: 1.55;
+      margin-bottom: 1.8rem;
+    }
+    .replay-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff85b3, #c2185b);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.65rem 2rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      box-shadow: 0 4px 15px rgba(233,30,140,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      border: none;
+      font-family: 'Poppins', sans-serif;
+    }
+    .replay-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(233,30,140,0.45);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-fade" id="pageFade"></div>
+
+  <!-- Background star & petal canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Fireworks canvas -->
+  <canvas id="fireworks-canvas"></canvas>
+
+  <div class="page">
+    
+    <!-- Gift Box container -->
+    <div class="gift-container" id="gift-container">
+      <div class="one-last-thing" id="one-last-text">One last thing...</div>
+      
+      <div class="birthday-text color-cycle" id="birthday-text">Happy Birthday Khizra! 🎂</div>
+
+      <div class="box-wrapper" id="box-clicker">
+        <div class="bow-wrap" id="bow-wrap">
+          <div class="bow-left"></div>
+          <div class="bow-right"></div>
+        </div>
+        <div class="box-lid" id="box-lid">
+          <div class="lid-ribbon"></div>
+        </div>
+        <div class="box-body" id="box-body">
+          <div class="body-ribbon"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice note player -->
+    <div class="voice-player" id="voice-player">
+      <button class="play-btn" id="play-btn">
+        <svg class="play-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <svg class="pause-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="display:none;">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+      </button>
+      <div class="waveform-wrap">
+        <div class="waveform-bars" id="waveform-bars"></div>
+      </div>
+      <div class="voice-info">
+        <span class="voice-title">A message for you 🎙️</span>
+        <span class="voice-time" id="voice-time">0:00</span>
+      </div>
+    </div>
+
+    <!-- Final Message Card -->
+    <div class="message-card-wrap" id="message-card">
+      <div class="message-card">
+        <p>Khizra, today you turn 20. Twenty years of being exactly who you are — and every single day has been a gift to everyone lucky enough to know you. Here’s to you. Always. 🌸</p>
+        <button class="replay-btn" id="replay-btn">Relive the magic 🔁</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Load Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    // ── BACKGROUND CANVAS (TWINKLING STARS & FALLING ROSE PETALS) ──
+    const bgCanvas = document.getElementById('bg-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let W = bgCanvas.width = window.innerWidth;
+    let H = bgCanvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      W = bgCanvas.width = window.innerWidth;
+      H = bgCanvas.height = window.innerHeight;
+    });
+
+    const stars = Array.from({ length: 80 }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: 0.5 + Math.random() * 1.5,
+      alpha: 0.2 + Math.random() * 0.8,
+      speed: 0.005 + Math.random() * 0.015,
+    }));
+
+    const petals = Array.from({ length: 22 }, () => ({
+      x: Math.random() * W,
+      y: -20 - Math.random() * H,
+      size: 8 + Math.random() * 14,
+      alpha: 0.4 + Math.random() * 0.5,
+      speedY: 0.6 + Math.random() * 1.0,
+      speedX: (Math.random() - 0.5) * 0.5,
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 1.5,
+    }));
+
+    function drawBackground() {
+      bgCtx.fillStyle = '#0d0010';
+      bgCtx.fillRect(0, 0, W, H);
+
+      // Twinkling stars
+      for (const s of stars) {
+        s.alpha += s.speed;
+        if (s.alpha > 1 || s.alpha < 0.2) s.speed = -s.speed;
+        bgCtx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.2, Math.min(1, s.alpha))})`;
+        bgCtx.beginPath();
+        bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        bgCtx.fill();
+      }
+
+      // Falling rose petals
+      for (const p of petals) {
+        p.y += p.speedY;
+        p.x += p.speedX;
+        p.rotation += p.rotationSpeed;
+
+        if (p.y > H + 20) {
+          p.y = -20;
+          p.x = Math.random() * W;
+        }
+
+        bgCtx.save();
+        bgCtx.translate(p.x, p.y);
+        bgCtx.rotate((p.rotation * Math.PI) / 180);
+        bgCtx.globalAlpha = p.alpha;
+
+        const grad = bgCtx.createRadialGradient(0, 0, 0, 0, 0, p.size);
+        grad.addColorStop(0, '#ffb6c1');
+        grad.addColorStop(0.5, '#e91e8c');
+        grad.addColorStop(1, '#660033');
+        bgCtx.fillStyle = grad;
+
+        bgCtx.beginPath();
+        bgCtx.ellipse(0, 0, p.size * 0.7, p.size, 0, 0, Math.PI * 2);
+        bgCtx.fill();
+        bgCtx.restore();
+      }
+    }
+
+
+    // ── FIREWORKS CANVAS ENGINE ──
+    const fwCanvas = document.getElementById('fireworks-canvas');
+    const fwCtx = fwCanvas.getContext('2d');
+    let rockets = [];
+    let particles = [];
+
+    function resizeFw() {
+      fwCanvas.width = window.innerWidth;
+      fwCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeFw);
+    resizeFw();
+
+    class Rocket {
+      constructor() {
+        this.x = Math.random() * fwCanvas.width;
+        this.y = fwCanvas.height;
+        this.tx = 100 + Math.random() * (fwCanvas.width - 200);
+        this.ty = 80 + Math.random() * (fwCanvas.height * 0.4);
+        this.speed = 4 + Math.random() * 3;
+        this.angle = Math.atan2(this.ty - this.y, this.tx - this.x);
+        this.vx = Math.cos(this.angle) * this.speed;
+        this.vy = Math.sin(this.angle) * this.speed;
+        this.color = ['#ff69b4', '#ff1493', '#ffc0cb', '#ffb6c1', '#ffffff'][Math.floor(Math.random() * 5)];
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if (this.vy < 0 && this.y <= this.ty) {
+          explode(this.x, this.y, this.color);
+          return false;
+        }
+        return true;
+      }
+      draw() {
+        fwCtx.save();
+        fwCtx.fillStyle = this.color;
+        fwCtx.shadowBlur = 8;
+        fwCtx.shadowColor = this.color;
+        fwCtx.beginPath();
+        fwCtx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+        fwCtx.fill();
+        fwCtx.restore();
+      }
+    }
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.2 + Math.random() * 4.5;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.gravity = 0.05 + Math.random() * 0.03;
+        this.drag = 0.97;
+        this.alpha = 1;
+        this.decay = 0.009 + Math.random() * 0.012;
+      }
+      update() {
+        this.vx *= this.drag;
+        this.vy *= this.drag;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+        return this.alpha > 0;
+      }
+      draw() {
+        fwCtx.save();
+        fwCtx.globalAlpha = this.alpha;
+        fwCtx.fillStyle = this.color;
+        fwCtx.shadowBlur = 6;
+        fwCtx.shadowColor = this.color;
+        fwCtx.beginPath();
+        fwCtx.arc(this.x, this.y, 1.5 + Math.random() * 1.2, 0, Math.PI * 2);
+        fwCtx.fill();
+        fwCtx.restore();
+      }
+    }
+
+    function explode(x, y, color) {
+      const count = 55 + Math.floor(Math.random() * 25);
+      for (let i = 0; i < count; i++) {
+        particles.push(new Particle(x, y, color));
+      }
+    }
+
+    let fwInterval = null;
+    function startFireworks() {
+      rockets.push(new Rocket());
+      let spawned = 1;
+      fwInterval = setInterval(() => {
+        if (spawned < 10) {
+          rockets.push(new Rocket());
+          spawned++;
+        } else {
+          clearInterval(fwInterval);
+        }
+      }, 700);
+    }
+
+    function updateFireworks() {
+      fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+      
+      rockets = rockets.filter(r => {
+        const active = r.update();
+        if (active) r.draw();
+        return active;
+      });
+      
+      particles = particles.filter(p => {
+        const active = p.update();
+        if (active) p.draw();
+        return active;
+      });
+    }
+
+    // ── MAIN RENDER LOOP ──
+    function mainLoop() {
+      drawBackground();
+      updateFireworks();
+      requestAnimationFrame(mainLoop);
+    }
+    requestAnimationFrame(mainLoop);
+
+
+    // ── GIFT BOX CLICK SEQUENCE ──
+    const giftContainer = document.getElementById('gift-container');
+    const boxClicker = document.getElementById('box-clicker');
+    const oneLastText = document.getElementById('one-last-text');
+    const birthdayText = document.getElementById('birthday-text');
+    
+    const voicePlayer = document.getElementById('voice-player');
+    const messageCard = document.getElementById('message-card');
+    
+    let boxOpened = false;
+
+    boxClicker.addEventListener('click', () => {
+      if (boxOpened) return;
+      boxOpened = true;
+
+      // 1. Trigger lid fly upward & explode class
+      giftContainer.classList.add('exploded');
+      oneLastText.style.opacity = '0';
+      setTimeout(() => oneLastText.style.display = 'none', 500);
+
+      // 2. Confetti explosion (canvas-confetti)
+      confetti({
+        particleCount: 300,
+        spread: 180,
+        colors: ['#ff1493', '#e91e8c', '#ff69b4', '#ffb6c1', '#db7093', '#ffc0cb']
+      });
+
+      // 3. Erupt Birthday text
+      setTimeout(() => {
+        birthdayText.classList.add('erupt');
+      }, 150);
+
+      // 4. Start backgrounds fireworks
+      startFireworks();
+
+      // 5. After 1.5s: show voice message player
+      setTimeout(() => {
+        voicePlayer.classList.add('visible');
+      }, 1500);
+
+      // 6. After 3s: show final message card sliding up
+      setTimeout(() => {
+        messageCard.classList.add('visible');
+      }, 3000);
+    });
+
+
+    // ── PHONE VOICE NOTE PLAYER SIMULATOR ──
+    const wBarsContainer = document.getElementById('waveform-bars');
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = playBtn.querySelector('.play-icon');
+    const pauseIcon = playBtn.querySelector('.pause-icon');
+    const voiceTime = document.getElementById('voice-time');
+
+    const barCount = 28;
+    const bars = [];
+
+    // Inject waveform bars
+    for (let i = 0; i < barCount; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'w-bar';
+      const baseH = 6 + Math.random() * 24;
+      bar.style.height = `${baseH}px`;
+      wBarsContainer.appendChild(bar);
+      bars.push({ el: bar, baseHeight: baseH });
+    }
+
+    let isPlaying = false;
+    let wAnimationId = null;
+    let playInterval = null;
+    let secondsElapsed = 0;
+    let audioCtx = null;
+
+    function animateWaveform() {
+      if (!isPlaying) return;
+      bars.forEach(b => {
+        const fluctuation = Math.sin(Date.now() * 0.015 + b.baseHeight) * 11;
+        const newH = Math.max(4, b.baseHeight + fluctuation);
+        b.el.style.height = `${newH}px`;
+      });
+      wAnimationId = requestAnimationFrame(animateWaveform);
+    }
+
+    // Play a synthesis of Birthday tune
+    function playBirthdayChime() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      // Melody: C4 C4 D4 C4 F4 E4 (Happy Birthday first line)
+      const notes = [
+        { note: 261.63, dur: 0.35, delay: 0.0 }, // C4
+        { note: 261.63, dur: 0.15, delay: 0.4 }, // C4
+        { note: 293.66, dur: 0.5, delay: 0.6 },  // D4
+        { note: 261.63, dur: 0.5, delay: 1.2 },  // C4
+        { note: 349.23, dur: 0.5, delay: 1.8 },  // F4
+        { note: 329.63, dur: 0.8, delay: 2.4 },  // E4
+        
+        { note: 261.63, dur: 0.35, delay: 3.4 }, // C4
+        { note: 261.63, dur: 0.15, delay: 3.8 }, // C4
+        { note: 293.66, dur: 0.5, delay: 4.0 },  // D4
+        { note: 261.63, dur: 0.5, delay: 4.6 },  // C4
+        { note: 392.00, dur: 0.5, delay: 5.2 },  // G4
+        { note: 349.23, dur: 0.8, delay: 5.8 },  // F4
+      ];
+
+      const startTime = audioCtx.currentTime;
+      notes.forEach(n => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(n.note, startTime + n.delay);
+        
+        gain.gain.setValueAtTime(0, startTime + n.delay);
+        gain.gain.linearRampToValueAtTime(0.12, startTime + n.delay + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + n.delay + n.dur);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start(startTime + n.delay);
+        osc.stop(startTime + n.delay + n.dur);
+      });
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) {
+        // Pause
+        isPlaying = false;
+        voicePlayer.classList.remove('playing');
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        cancelAnimationFrame(wAnimationId);
+        clearInterval(playInterval);
+      } else {
+        // Play
+        isPlaying = true;
+        voicePlayer.classList.add('playing');
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+        animateWaveform();
+        
+        // Play sweet electronic chime
+        playBirthdayChime();
+        
+        // Timer counts up
+        secondsElapsed = 0;
+        voiceTime.textContent = '0:00';
+        
+        playInterval = setInterval(() => {
+          secondsElapsed++;
+          if (secondsElapsed >= 8) {
+            // Stop after melody ends
+            isPlaying = false;
+            voicePlayer.classList.remove('playing');
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            cancelAnimationFrame(wAnimationId);
+            clearInterval(playInterval);
+            voiceTime.textContent = '0:08';
+            
+            // Reset bars
+            bars.forEach(b => { b.el.style.height = `${b.baseHeight}px`; });
+          } else {
+            voiceTime.textContent = `0:0${secondsElapsed}`;
+          }
+        }, 1000);
+      }
+    });
+
+
+    // ── REPLAY BUTTON TRANSITION ──
+    const replayBtn = document.getElementById('replay-btn');
+    const fade = document.getElementById('pageFade');
+
+    replayBtn.addEventListener('click', () => {
+      fade.classList.add('out');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 300);
+    });
+  </script>
+  <script src="music.js"></script>
+</body>
+</html>
