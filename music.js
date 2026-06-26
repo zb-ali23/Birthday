@@ -307,20 +307,20 @@
     let vol = 0;
     audio.volume = 0;
     const interval = setInterval(() => {
-      vol += 0.05;
+      vol += 0.1;
       if (vol >= 0.7) {
         audio.volume = 0.7;
         clearInterval(interval);
       } else {
         audio.volume = vol;
       }
-    }, 30);
+    }, 15);
   }
 
   function fadeOutVolume(callback) {
     let vol = audio.volume;
     const interval = setInterval(() => {
-      vol -= 0.05;
+      vol -= 0.1;
       if (vol <= 0) {
         audio.volume = 0;
         clearInterval(interval);
@@ -328,7 +328,7 @@
       } else {
         audio.volume = vol;
       }
-    }, 30);
+    }, 15);
   }
 
   // 6. Resume saved state on load
@@ -358,23 +358,44 @@
 
     // Resume only if it wasn't manually paused
     if (!isPaused) {
-      audio.play()
-        .then(() => {
-          updateUI(true);
-        })
-        .catch(err => {
-          console.log("Autoplay blocked by browser, waiting for interaction:", err);
-          updateUI(false);
-          // Show gentle floating widget hint
-          if (floatWidget) {
-            setTimeout(() => {
-              if (audio && audio.paused) {
-                floatWidget.classList.add('hint');
-                setTimeout(() => floatWidget.classList.remove('hint'), 4000);
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            updateUI(true);
+          })
+          .catch(err => {
+            console.log("Autoplay blocked by browser, waiting for user interaction:", err);
+            updateUI(false);
+            
+            // Register interaction listeners to resume playing as soon as the user interacts with the page
+            const playOnInteraction = () => {
+              const stillPaused = localStorage.getItem(LOCAL_STORAGE_PAUSED_KEY) === 'true';
+              if (!stillPaused && audio && audio.paused) {
+                audio.play()
+                  .then(() => {
+                    updateUI(true);
+                    cleanListeners();
+                  })
+                  .catch(e => console.log("Failed to play on interaction:", e));
+              } else {
+                cleanListeners();
               }
-            }, 800);
-          }
-        });
+            };
+            
+            const cleanListeners = () => {
+              document.removeEventListener('click', playOnInteraction);
+              document.removeEventListener('touchstart', playOnInteraction);
+              document.removeEventListener('keydown', playOnInteraction);
+              document.removeEventListener('scroll', playOnInteraction);
+            };
+            
+            document.addEventListener('click', playOnInteraction);
+            document.addEventListener('touchstart', playOnInteraction);
+            document.addEventListener('keydown', playOnInteraction);
+            document.addEventListener('scroll', playOnInteraction);
+          });
+      }
     } else {
       updateUI(false);
     }
@@ -480,10 +501,14 @@
         // 1. Immediately clean up intensive JS loops and animations to prevent transition lag
         cleanupBeforeNavigation();
 
-        // 2. Play fast fade-out animation
+        // 2. Play fast fade-out animation and music fade-out
         const fade = document.getElementById('pageFade') || getOrCreateFade();
         fade.classList.remove('gone');
         fade.classList.add('out');
+
+        if (audio && !audio.paused) {
+          fadeOutVolume();
+        }
 
         // 3. Snappy navigate after 250ms (instead of 650ms/800ms)
         setTimeout(() => {
